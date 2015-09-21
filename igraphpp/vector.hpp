@@ -93,7 +93,7 @@ public:
 
   Vector &operator=(const Vector &other);
 
-  Vector &operator=(const Vector &&other);
+  Vector &operator=(Vector &&other);
 
   Vector operator+(double scalar) noexcept;
 

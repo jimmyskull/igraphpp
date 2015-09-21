@@ -22,7 +22,7 @@ private:
 };
 
 static inline int SafeCall(int ret) {
-  if (ret != IGRAPH_SUCCESS)
+  if (IGRAPH_UNLIKELY(ret != IGRAPH_SUCCESS))
     throw Exception(ret);
   return ret;
 }

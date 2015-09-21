@@ -25,7 +25,7 @@ public:
 
   Graph &operator=(const Graph &other);
 
-  Graph &operator=(const Graph &&other);
+  Graph &operator=(Graph &&other);
 
   int vcount() const noexcept;
 

@@ -5,6 +5,10 @@
 #error "You must include igraph.hpp first"
 #endif
 
+#ifndef NDEBUG
+#include <cstring>
+#endif
+
 #include <igraph.h>
 
 namespace igraph {
@@ -19,13 +23,22 @@ Graph::Graph(const VectorView &vector, int vertices, bool directed) {
   SafeCall(igraph_create(&graph_, vector.ptr(), vertices, directed));
 }
 
-Graph::~Graph() { SafeCall(igraph_destroy(&graph_)); }
+Graph::~Graph() { 
+  if (VECTOR(graph_.from) != NULL)
+    SafeCall(igraph_destroy(&graph_)); 
+}
 
 Graph::Graph(const Graph &other) {
   SafeCall(igraph_copy(&graph_, &other.graph_));
 }
 
-Graph::Graph(Graph &&other) { graph_ = std::move(other.graph_); }
+Graph::Graph(Graph &&other) { 
+  graph_ = other.graph_; 
+#ifndef NDEBUG
+  std::memset(&other.graph_, 0, sizeof(other.graph_));
+#endif
+  VECTOR(other.graph_.from) = NULL;
+}
 
 Graph &Graph::operator=(const Graph &other) {
   if (this == &other)
@@ -35,8 +48,12 @@ Graph &Graph::operator=(const Graph &other) {
   return *this;
 }
 
-Graph &Graph::operator=(const Graph &&other) {
-  graph_ = std::move(other.graph_);
+Graph &Graph::operator=(Graph &&other) {
+  graph_ = other.graph_;
+#ifndef NDEBUG
+  std::memset(&other.graph_, 0, sizeof(other.graph_));
+#endif
+  other.graph_.from.stor_begin = NULL;
   return *this;
 }
 

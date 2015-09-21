@@ -139,11 +139,8 @@ Vector::Vector(double from, double to) : VectorView() {
 }
 
 Vector::~Vector() {
-  // TODO: Note that vectors created by igraph_vector_view() are special, you
-  // mustn't call igraph_vector_destroy() on these.
-  // TODO: The move semantics is not working, and it tries to release memory
-  // is should not own anymore.
-  //igraph_vector_destroy(&vector_);
+  if (VECTOR(vector_) != NULL)
+    igraph_vector_destroy(&vector_);
 }
 
 Vector::Vector(const Vector &other) : VectorView() {
@@ -151,7 +148,8 @@ Vector::Vector(const Vector &other) : VectorView() {
 }
 
 Vector::Vector(Vector &&other) : VectorView() {
-  vector_ = std::move(other.vector_);
+  vector_ = other.vector_;
+  VECTOR(other.vector_) = NULL;
 }
 
 Vector &Vector::operator=(const Vector &other) {
@@ -162,27 +160,28 @@ Vector &Vector::operator=(const Vector &other) {
   return *this;
 }
 
-Vector &Vector::operator=(const Vector &&other) {
-  vector_ = std::move(other.vector_);
+Vector &Vector::operator=(Vector &&other) {
+  vector_ = other.vector_;
+  VECTOR(other.vector_) = NULL;
   return *this;
 }
 
 Vector Vector::operator+(double scalar) noexcept {
   Vector a(*this);
   igraph_vector_add_constant(a.ptr(), scalar);
-  return std::move(a);
+  return a;
 }
 
 Vector Vector::operator-(double scalar) noexcept {
   Vector a(*this);
   igraph_vector_add_constant(a.ptr(), -scalar);
-  return std::move(a);
+  return a;
 }
 
 Vector Vector::operator*(double scalar) noexcept {
   Vector a(*this);
   igraph_vector_scale(a.ptr(), scalar);
-  return std::move(a);
+  return a;
 }
 
 Vector &Vector::operator+=(double scalar) noexcept {
@@ -203,13 +202,13 @@ Vector &Vector::operator*=(double scalar) noexcept {
 Vector Vector::operator*(const VectorView &b) {
   Vector a(*this);
   SafeCall(igraph_vector_mul(a.ptr(), b.ptr()));
-  return std::move(a);
+  return a;
 }
 
 Vector Vector::operator/(const VectorView &b) {
   Vector a(*this);
   SafeCall(igraph_vector_div(&a.vector_, b.ptr()));
-  return std::move(a);
+  return a;
 }
 
 Vector &Vector::operator+=(const VectorView &b) {
