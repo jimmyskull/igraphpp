@@ -15,7 +15,7 @@ Graph::Graph(int vertices, Directedness dir) {
   SafeCall(igraph_empty(&graph_, vertices, dir));
 }
 
-Graph::Graph(int vertices, const VectorView& vector, bool directed) {
+Graph::Graph(const VectorView &vector, int vertices, bool directed) {
   SafeCall(igraph_create(&graph_, vector.ptr(), vertices, directed));
 }
 
@@ -54,7 +54,7 @@ bool Graph::is_connected(Connectedness mode) const {
   return static_cast<bool>(connected);
 }
 
-int Graph::diameter(bool directed, bool unconnected) const {
+int Graph::diameter(Directedness directed, bool unconnected) const {
   int length = 0;
   int ret = igraph_diameter(&graph_, &length, NULL, NULL, NULL, directed,
                             unconnected);
@@ -62,13 +62,40 @@ int Graph::diameter(bool directed, bool unconnected) const {
   return length;
 }
 
+Vector Graph::degrees(DegreeMode mode, Loops loops) const {
+  Vector v;
+  bool lps = (loops == AllowLoops);
+  SafeCall(igraph_degree(&graph_, v.ptr(), igraph_vss_all(), static_cast<igraph_neimode_t>(mode), lps));
+  return std::move(v);
+}
+
 Graph &Graph::AddEdge(int from, int to) {
   SafeCall(igraph_add_edge(&graph_, from, to));
   return *this;
 }
 
+Graph &Graph::AddEdges(const Vector &edges) {
+  SafeCall(igraph_add_edges(&graph_, edges.ptr(), NULL));
+  return *this;
+}
+
+double Graph::AveragePathLength(Directedness directed, bool unconnected) const {
+  double ret;
+  SafeCall(igraph_average_path_length(&graph_, &ret, directed, unconnected));
+  return ret;
+}
+
+Graph Graph::Lattice(const Vector &dimension, int nei, Directedness dir,
+                     Mutuality mutual, Periodicity periodicity) {
+  igraph_t graph;
+  int ret =
+      igraph_lattice(&graph, dimension.ptr(), nei, dir, mutual, periodicity);
+  SafeCall(ret);
+  return Graph(graph);
+}
+
 Graph Graph::ErdosRenyiGame(int vertices, double prob, Directedness dir,
-                            Loops loops) throw(Exception) {
+                            Loops loops) {
   igraph_t graph;
   int ret = igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, vertices,
                                     prob, dir, loops);
@@ -77,7 +104,7 @@ Graph Graph::ErdosRenyiGame(int vertices, double prob, Directedness dir,
 }
 
 Graph Graph::ErdosRenyiGame(int vertices, int edges, Directedness dir,
-                            Loops loops) throw(Exception) {
+                            Loops loops) {
   igraph_t graph;
   int ret = igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNM, vertices,
                                     edges, dir, loops);

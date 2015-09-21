@@ -17,6 +17,12 @@ enum Connectedness {
   StronglyConnected = IGRAPH_STRONG
 };
 
+enum DegreeMode { Out = IGRAPH_OUT, In = IGRAPH_IN, All = IGRAPH_ALL };
+
+enum Mutuality { NotMutual = false, MutualConnections = true };
+
+enum Periodicity { NotPeriodic = false, Circular = true };
+
 enum Loops { NoLoops = IGRAPH_NO_LOOPS, AllowLoops = IGRAPH_LOOPS };
 
 static inline int SetSeed(unsigned long int seed) {

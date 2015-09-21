@@ -13,21 +13,73 @@ namespace igraph {
 
 class VectorView {
 public:
-  VectorView(const double* data, long int length);
+  VectorView(const double *data, long int length);
 
   ~VectorView();
 
+  double &operator[](long int i) const noexcept;
+
+  bool operator==(const VectorView &b) const noexcept;
+
+  bool operator<(const VectorView &b) const noexcept;
+
+  bool operator>(const VectorView &b) const noexcept;
+
+  bool operator<=(const VectorView &b) const noexcept;
+
+  bool operator>=(const VectorView &b) const noexcept;
+
+  double min() const noexcept;
+
+  double max() const noexcept;
+
+  double sum() const noexcept;
+
+  double prod() const noexcept;
+
+  long int which_min() const noexcept;
+
+  long int which_max() const noexcept;
+
+  void minmax(double *min, double *max) const;
+
+  void which_minmax(long int *min, long int *max) const;
+
+  bool IsInInterval(double low, double high) const noexcept;
+
+  double MaxDifference(const VectorView &b) const noexcept;
+
+  bool Contains(double value) const noexcept;
+
+  long int Search(double value, long int from = 0) const noexcept;
+
+  long int BinarySearch(double value) const noexcept;
+
+  void Sort() noexcept;
+
+  void SetNull() noexcept;
+
+  void Fill(double value) noexcept;
+
+  bool empty() const noexcept;
+
   long int size() const noexcept;
 
-  const igraph_vector_t* ptr() const;
+  long int capacity() const noexcept;
 
-private:
+  const igraph_vector_t *ptr() const;
+
+  void CopyTo(double *output) noexcept;
+
+protected:
+  VectorView() = default;
+
   igraph_vector_t vector_;
 };
 
-class Vector {
+class Vector : public VectorView {
 public:
-  Vector(int long size);
+  Vector(int long size = 0);
 
   Vector(const double *data, long int length);
 
@@ -43,25 +95,68 @@ public:
 
   Vector &operator=(const Vector &&other);
 
-  double operator[](long int i) const noexcept;
+  Vector operator+(double scalar) noexcept;
 
-  void SetNull() noexcept;
+  Vector operator-(double scalar) noexcept;
 
-  void Fill(double value) noexcept;
+  Vector operator*(double scalar) noexcept;
+
+  Vector &operator+=(double scalar) noexcept;
+
+  Vector &operator-=(double scalar) noexcept;
+
+  Vector &operator*=(double scalar) noexcept;
+
+  Vector operator*(const VectorView &b);
+
+  Vector operator/(const VectorView &b);
+
+  Vector &operator+=(const VectorView &b);
+
+  Vector &operator-=(const VectorView &b);
+
+  Vector &operator*=(const VectorView &b);
+
+  Vector &operator/=(const VectorView &b);
+
+  igraph_vector_t *ptr();
+
+  const igraph_vector_t *ptr() const;
+
+  void Clear() noexcept;
+
+  void Reserve(long int size);
+
+  void Resize(long int size);
+
+  void ResizeMin();
+
+  void PushBack(double value);
+
+  double PopBack() noexcept;
+
+  void Insert(long int pos, double value);
+
+  void Remove(long int pos) noexcept;
+
+  void Remove(long int from, long int to) noexcept;
 
   void CopyTo(double *output) noexcept;
 
-  void Update(const Vector& input) noexcept;
+  void Update(const Vector &input) noexcept;
 
-  void Append(const Vector& input);
+  void Append(const Vector &input);
 
-  long int size() const noexcept;
+  void Swap(long int i, long int j) noexcept;
+
+  void Swap(Vector &b);
+
+  void Reverse() noexcept;
+
+  void Shuffle() noexcept;
 
 protected:
-  Vector(const igraph_vector_t &vector);
-
-private:
-  igraph_vector_t vector_;
+  explicit Vector(const igraph_vector_t &vector);
 };
 
 } // namespace igraph
