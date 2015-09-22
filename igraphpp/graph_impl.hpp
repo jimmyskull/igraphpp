@@ -23,17 +23,17 @@ Graph::Graph(const VectorView &vector, int vertices, bool directed) {
   SafeCall(igraph_create(&graph_, vector.ptr(), vertices, directed));
 }
 
-Graph::~Graph() { 
+Graph::~Graph() {
   if (VECTOR(graph_.from) != NULL)
-    SafeCall(igraph_destroy(&graph_)); 
+    SafeCall(igraph_destroy(&graph_));
 }
 
 Graph::Graph(const Graph &other) {
   SafeCall(igraph_copy(&graph_, &other.graph_));
 }
 
-Graph::Graph(Graph &&other) { 
-  graph_ = other.graph_; 
+Graph::Graph(Graph &&other) {
+  graph_ = other.graph_;
 #ifndef NDEBUG
   std::memset(&other.graph_, 0, sizeof(other.graph_));
 #endif
@@ -79,10 +79,11 @@ int Graph::diameter(Directedness directed, bool unconnected) const {
   return length;
 }
 
-Vector Graph::degrees(DegreeMode mode, Loops loops) const {
+Vector Graph::degrees(NeighborMode mode, Loops loops) const {
   Vector v;
   bool lps = (loops == AllowLoops);
-  SafeCall(igraph_degree(&graph_, v.ptr(), igraph_vss_all(), static_cast<igraph_neimode_t>(mode), lps));
+  SafeCall(igraph_degree(&graph_, v.ptr(), igraph_vss_all(),
+                         static_cast<igraph_neimode_t>(mode), lps));
   return std::move(v);
 }
 

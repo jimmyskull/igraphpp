@@ -13,63 +13,81 @@ namespace igraph {
 
 class VectorView {
 public:
+  /* Constructors and Destructors */
+  ~VectorView();
   VectorView(const double *data, long int length);
 
-  ~VectorView();
+  /* Initializing elements */
+  void null() noexcept;
+  void fill(double value) noexcept;
 
+  /* Accessing elements */
   double &operator[](long int i) const noexcept;
+  double &at(long int i) const noexcept;
 
+  /* Copying vectors */
+  void copy_to(double *output) noexcept;
+  void update(const VectorView &input) noexcept;
+
+  /* Exchanging elements */
+  void swap(long int i, long int j) noexcept;
+  void swap(VectorView &b);
+  void shuffle() noexcept;
+  void reverse() noexcept;
+
+  /* Vector operations */
+  VectorView operator+(double scalar) noexcept;
+  VectorView operator-(double scalar) noexcept;
+  VectorView operator*(double scalar) noexcept;
+  VectorView &operator+=(double scalar) noexcept;
+  VectorView &operator-=(double scalar) noexcept;
+  VectorView &operator*=(double scalar) noexcept;
+  VectorView operator*(const VectorView &b);
+  VectorView operator/(const VectorView &b);
+  VectorView &operator+=(const VectorView &b);
+  VectorView &operator-=(const VectorView &b);
+  VectorView &operator*=(const VectorView &b);
+  VectorView &operator/=(const VectorView &b);
+
+  /* Vector comparisons */
   bool operator==(const VectorView &b) const noexcept;
-
   bool operator<(const VectorView &b) const noexcept;
-
   bool operator>(const VectorView &b) const noexcept;
-
   bool operator<=(const VectorView &b) const noexcept;
-
   bool operator>=(const VectorView &b) const noexcept;
 
+  /* Finding minimum and maximum */
   double min() const noexcept;
-
   double max() const noexcept;
-
-  double sum() const noexcept;
-
-  double prod() const noexcept;
-
   long int which_min() const noexcept;
-
   long int which_max() const noexcept;
-
   void minmax(double *min, double *max) const;
-
   void which_minmax(long int *min, long int *max) const;
 
-  bool IsInInterval(double low, double high) const noexcept;
-
-  double MaxDifference(const VectorView &b) const noexcept;
-
-  bool Contains(double value) const noexcept;
-
-  long int Search(double value, long int from = 0) const noexcept;
-
-  long int BinarySearch(double value) const noexcept;
-
-  void Sort() noexcept;
-
-  void SetNull() noexcept;
-
-  void Fill(double value) noexcept;
-
+  /* Vector properties */
   bool empty() const noexcept;
-
   long int size() const noexcept;
-
   long int capacity() const noexcept;
+  double sum() const noexcept;
+  double prod() const noexcept;
+  bool isininterval(double low, double high) const noexcept;
+  double maxdifference(const VectorView &b) const noexcept;
 
+  /* Searching for elements */
+  bool contains(double value) const noexcept;
+  long int search(double value, long int from = 0) const noexcept;
+  long int binsearch(double value) const noexcept;
+
+  /* Sorting */
+  void sort() noexcept;
+
+  /* Set operations on sorted vectors */
+  VectorView intersect_sorted(const VectorView &v2);
+  VectorView difference_sorted(const VectorView &v2);
+
+  /* Internal use */
   const igraph_vector_t *ptr() const;
-
-  void CopyTo(double *output) noexcept;
+  igraph_vector_t *ptr();
 
 protected:
   VectorView() = default;
@@ -79,81 +97,30 @@ protected:
 
 class Vector : public VectorView {
 public:
-  Vector(int long size = 0);
-
-  Vector(const double *data, long int length);
-
-  Vector(double from, double to);
-
+  /* Constructors and Destructors */
   ~Vector();
-
+  Vector(int long size = 0);
+  Vector(const double *data, long int length);
+  Vector(double from, double to);
   Vector(const Vector &other);
-
   Vector(Vector &&other);
-
-  Vector &operator=(const Vector &other);
 
   Vector &operator=(Vector &&other);
 
-  Vector operator+(double scalar) noexcept;
+  /* Copying vectors */
+  Vector &operator=(const Vector &other);
+  void append(const Vector &input);
 
-  Vector operator-(double scalar) noexcept;
-
-  Vector operator*(double scalar) noexcept;
-
-  Vector &operator+=(double scalar) noexcept;
-
-  Vector &operator-=(double scalar) noexcept;
-
-  Vector &operator*=(double scalar) noexcept;
-
-  Vector operator*(const VectorView &b);
-
-  Vector operator/(const VectorView &b);
-
-  Vector &operator+=(const VectorView &b);
-
-  Vector &operator-=(const VectorView &b);
-
-  Vector &operator*=(const VectorView &b);
-
-  Vector &operator/=(const VectorView &b);
-
-  igraph_vector_t *ptr();
-
-  const igraph_vector_t *ptr() const;
-
-  void Clear() noexcept;
-
-  void Reserve(long int size);
-
-  void Resize(long int size);
-
-  void ResizeMin();
-
-  void PushBack(double value);
-
-  double PopBack() noexcept;
-
-  void Insert(long int pos, double value);
-
-  void Remove(long int pos) noexcept;
-
-  void Remove(long int from, long int to) noexcept;
-
-  void CopyTo(double *output) noexcept;
-
-  void Update(const Vector &input) noexcept;
-
-  void Append(const Vector &input);
-
-  void Swap(long int i, long int j) noexcept;
-
-  void Swap(Vector &b);
-
-  void Reverse() noexcept;
-
-  void Shuffle() noexcept;
+  /* Resizing operations */
+  void clear() noexcept;
+  void reserve(long int size);
+  void resize(long int size);
+  void resize_min();
+  void push_back(double value);
+  double pop_back() noexcept;
+  void insert(long int pos, double value);
+  void remove(long int pos) noexcept;
+  void remove(long int from, long int to) noexcept;
 
 protected:
   explicit Vector(const igraph_vector_t &vector);

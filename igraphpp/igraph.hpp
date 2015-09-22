@@ -17,7 +17,7 @@ enum Connectedness {
   StronglyConnected = IGRAPH_STRONG
 };
 
-enum DegreeMode { Out = IGRAPH_OUT, In = IGRAPH_IN, All = IGRAPH_ALL };
+enum NeighborMode { Out = IGRAPH_OUT, In = IGRAPH_IN, All = IGRAPH_ALL };
 
 enum Mutuality { NotMutual = false, MutualConnections = true };
 
@@ -34,6 +34,7 @@ static inline int SetSeed(unsigned long int seed) {
 } // namespace igraph
 
 #include "./vector.hpp"
+#include "./vertex_selector.hpp"
 #include "./graph.hpp"
 
 #endif // IGRAPHPP_IGRAPH_HPP_

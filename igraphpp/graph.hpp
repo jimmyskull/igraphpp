@@ -37,7 +37,7 @@ public:
 
   int diameter(Directedness directed = Directed, bool unconnected = true) const;
 
-  Vector degrees(DegreeMode mode = All, Loops loops = AllowLoops) const;
+  Vector degrees(NeighborMode mode = All, Loops loops = AllowLoops) const;
 
   Graph &AddEdge(int from, int to);
 

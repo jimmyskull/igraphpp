@@ -9,16 +9,113 @@
 
 namespace igraph {
 
-VectorView::VectorView(const double *data, long int length) {
-  igraph_vector_view(&vector_, data, length);
-}
-
 VectorView::~VectorView() {
   // This |vector_| must not be released from the memory.
 }
 
+VectorView::VectorView(const double *data, long int length) {
+  igraph_vector_view(&vector_, data, length);
+}
+
+void VectorView::null() noexcept { igraph_vector_null(&vector_); }
+
+void VectorView::fill(double value) noexcept {
+  igraph_vector_fill(&vector_, value);
+}
+
 double &VectorView::operator[](long int i) const noexcept {
   return VECTOR(vector_)[i];
+}
+
+double &VectorView::at(long int i) const noexcept { return VECTOR(vector_)[i]; }
+
+void VectorView::copy_to(double *output) noexcept {
+  igraph_vector_copy_to(&vector_, output);
+}
+
+void VectorView::update(const VectorView &input) noexcept {
+  igraph_vector_update(&vector_, &input.vector_);
+}
+
+void VectorView::swap(long int i, long int j) noexcept {
+  SafeCall(igraph_vector_swap_elements(&vector_, i, j));
+}
+
+void VectorView::swap(VectorView &b) {
+  SafeCall(igraph_vector_swap(&vector_, b.ptr()));
+}
+
+void VectorView::shuffle() noexcept {
+  SafeCall(igraph_vector_shuffle(&vector_));
+}
+
+void VectorView::reverse() noexcept {
+  SafeCall(igraph_vector_reverse(&vector_));
+}
+
+VectorView VectorView::operator+(double scalar) noexcept {
+  VectorView a(*this);
+  igraph_vector_add_constant(a.ptr(), scalar);
+  return a;
+}
+
+VectorView VectorView::operator-(double scalar) noexcept {
+  VectorView a(*this);
+  igraph_vector_add_constant(a.ptr(), -scalar);
+  return a;
+}
+
+VectorView VectorView::operator*(double scalar) noexcept {
+  VectorView a(*this);
+  igraph_vector_scale(a.ptr(), scalar);
+  return a;
+}
+
+VectorView &VectorView::operator+=(double scalar) noexcept {
+  igraph_vector_add_constant(&vector_, scalar);
+  return *this;
+}
+
+VectorView &VectorView::operator-=(double scalar) noexcept {
+  igraph_vector_add_constant(&vector_, scalar);
+  return *this;
+}
+
+VectorView &VectorView::operator*=(double scalar) noexcept {
+  igraph_vector_scale(&vector_, scalar);
+  return *this;
+}
+
+VectorView VectorView::operator*(const VectorView &b) {
+  VectorView a(*this);
+  SafeCall(igraph_vector_mul(a.ptr(), b.ptr()));
+  return a;
+}
+
+VectorView VectorView::operator/(const VectorView &b) {
+  VectorView a(*this);
+  SafeCall(igraph_vector_div(&a.vector_, b.ptr()));
+  return a;
+}
+
+VectorView &VectorView::operator+=(const VectorView &b) {
+  SafeCall(igraph_vector_add(&vector_, b.ptr()));
+  return *this;
+}
+
+VectorView &VectorView::operator-=(const VectorView &b) {
+  SafeCall(igraph_vector_sub(&vector_, b.ptr()));
+  return *this;
+}
+
+VectorView &VectorView::operator*=(const VectorView &b) {
+  SafeCall(igraph_vector_mul(&vector_, b.ptr()));
+  return *this;
+}
+
+VectorView &VectorView::operator/=(const VectorView &b) {
+  SafeCall(igraph_vector_div(&vector_, b.ptr()));
+  return *this;
 }
 
 bool VectorView::operator==(const VectorView &b) const noexcept {
@@ -45,12 +142,6 @@ double VectorView::min() const noexcept { return igraph_vector_min(&vector_); }
 
 double VectorView::max() const noexcept { return igraph_vector_max(&vector_); }
 
-double VectorView::sum() const noexcept { return igraph_vector_sum(&vector_); }
-
-double VectorView::prod() const noexcept {
-  return igraph_vector_prod(&vector_);
-}
-
 long int VectorView::which_min() const noexcept {
   return igraph_vector_which_min(&vector_);
 }
@@ -67,42 +158,6 @@ void VectorView::which_minmax(long int *min, long int *max) const {
   SafeCall(igraph_vector_which_minmax(&vector_, min, max));
 }
 
-bool VectorView::IsInInterval(double low, double high) const noexcept {
-  return igraph_vector_isininterval(&vector_, low, high);
-}
-
-double VectorView::MaxDifference(const VectorView &b) const noexcept {
-  return igraph_vector_maxdifference(&vector_, b.ptr());
-}
-
-bool VectorView::Contains(double value) const noexcept {
-  return igraph_vector_contains(&vector_, value);
-}
-
-long int VectorView::Search(double value, long int from) const noexcept {
-  long int result;
-  bool contains = igraph_vector_search(&vector_, from, value, &result);
-  if (contains)
-    return result;
-  return -1;
-}
-
-long int VectorView::BinarySearch(double value) const noexcept {
-  long int result;
-  bool contains = igraph_vector_binsearch(&vector_, value, &result);
-  if (contains)
-    return result;
-  return -1;
-}
-
-void VectorView::Sort() noexcept { igraph_vector_sort(&vector_); }
-
-void VectorView::SetNull() noexcept { igraph_vector_null(&vector_); }
-
-void VectorView::Fill(double value) noexcept {
-  igraph_vector_fill(&vector_, value);
-}
-
 bool VectorView::empty() const noexcept {
   return igraph_vector_empty(&vector_);
 }
@@ -115,11 +170,57 @@ long int VectorView::capacity() const noexcept {
   return igraph_vector_capacity(&vector_);
 }
 
+double VectorView::sum() const noexcept { return igraph_vector_sum(&vector_); }
+
+double VectorView::prod() const noexcept {
+  return igraph_vector_prod(&vector_);
+}
+
+bool VectorView::isininterval(double low, double high) const noexcept {
+  return igraph_vector_isininterval(&vector_, low, high);
+}
+
+double VectorView::maxdifference(const VectorView &b) const noexcept {
+  return igraph_vector_maxdifference(&vector_, b.ptr());
+}
+
+bool VectorView::contains(double value) const noexcept {
+  return igraph_vector_contains(&vector_, value);
+}
+
+long int VectorView::search(double value, long int from) const noexcept {
+  long int result;
+  bool contains = igraph_vector_search(&vector_, from, value, &result);
+  if (contains)
+    return result;
+  return -1;
+}
+
+long int VectorView::binsearch(double value) const noexcept {
+  long int result;
+  bool contains = igraph_vector_binsearch(&vector_, value, &result);
+  if (contains)
+    return result;
+  return -1;
+}
+
+void VectorView::sort() noexcept { igraph_vector_sort(&vector_); }
+
+VectorView VectorView::intersect_sorted(const VectorView &v2) {
+  Vector result;
+  SafeCall(igraph_vector_intersect_sorted(ptr(), v2.ptr(), result.ptr()));
+  return result;
+}
+
+VectorView VectorView::difference_sorted(const VectorView &v2) {
+  Vector result;
+  SafeCall(igraph_vector_difference_sorted(ptr(), v2.ptr(), result.ptr()));
+  return result;
+}
+
 const igraph_vector_t *VectorView::ptr() const { return &vector_; }
 
-void VectorView::CopyTo(double *output) noexcept {
-  igraph_vector_copy_to(&vector_, output);
-}
+igraph_vector_t *VectorView::ptr() { return &vector_; }
 
 Vector::Vector(const igraph_vector_t &vector) : VectorView() {
   SafeCall(igraph_vector_copy(&vector_, &vector));
@@ -152,6 +253,12 @@ Vector::Vector(Vector &&other) : VectorView() {
   VECTOR(other.vector_) = NULL;
 }
 
+Vector &Vector::operator=(Vector &&other) {
+  vector_ = other.vector_;
+  VECTOR(other.vector_) = NULL;
+  return *this;
+}
+
 Vector &Vector::operator=(const Vector &other) {
   if (this == &other)
     return *this;
@@ -160,134 +267,38 @@ Vector &Vector::operator=(const Vector &other) {
   return *this;
 }
 
-Vector &Vector::operator=(Vector &&other) {
-  vector_ = other.vector_;
-  VECTOR(other.vector_) = NULL;
-  return *this;
+void Vector::append(const Vector &input) {
+  SafeCall(igraph_vector_append(&vector_, &input.vector_));
 }
+void Vector::clear() noexcept { igraph_vector_clear(&vector_); }
 
-Vector Vector::operator+(double scalar) noexcept {
-  Vector a(*this);
-  igraph_vector_add_constant(a.ptr(), scalar);
-  return a;
-}
-
-Vector Vector::operator-(double scalar) noexcept {
-  Vector a(*this);
-  igraph_vector_add_constant(a.ptr(), -scalar);
-  return a;
-}
-
-Vector Vector::operator*(double scalar) noexcept {
-  Vector a(*this);
-  igraph_vector_scale(a.ptr(), scalar);
-  return a;
-}
-
-Vector &Vector::operator+=(double scalar) noexcept {
-  igraph_vector_add_constant(&vector_, scalar);
-  return *this;
-}
-
-Vector &Vector::operator-=(double scalar) noexcept {
-  igraph_vector_add_constant(&vector_, scalar);
-  return *this;
-}
-
-Vector &Vector::operator*=(double scalar) noexcept {
-  igraph_vector_scale(&vector_, scalar);
-  return *this;
-}
-
-Vector Vector::operator*(const VectorView &b) {
-  Vector a(*this);
-  SafeCall(igraph_vector_mul(a.ptr(), b.ptr()));
-  return a;
-}
-
-Vector Vector::operator/(const VectorView &b) {
-  Vector a(*this);
-  SafeCall(igraph_vector_div(&a.vector_, b.ptr()));
-  return a;
-}
-
-Vector &Vector::operator+=(const VectorView &b) {
-  SafeCall(igraph_vector_add(&vector_, b.ptr()));
-  return *this;
-}
-
-Vector &Vector::operator-=(const VectorView &b) {
-  SafeCall(igraph_vector_sub(&vector_, b.ptr()));
-  return *this;
-}
-
-Vector &Vector::operator*=(const VectorView &b) {
-  SafeCall(igraph_vector_mul(&vector_, b.ptr()));
-  return *this;
-}
-
-Vector &Vector::operator/=(const VectorView &b) {
-  SafeCall(igraph_vector_div(&vector_, b.ptr()));
-  return *this;
-}
-
-igraph_vector_t *Vector::ptr() { return &vector_; }
-
-const igraph_vector_t *Vector::ptr() const { return &vector_; }
-
-void Vector::Clear() noexcept { igraph_vector_clear(&vector_); }
-
-void Vector::Reserve(long int size) {
+void Vector::reserve(long int size) {
   SafeCall(igraph_vector_reserve(&vector_, size));
 }
 
-void Vector::Resize(long int size) {
+void Vector::resize(long int size) {
   SafeCall(igraph_vector_resize(&vector_, size));
 }
 
-void Vector::ResizeMin() { SafeCall(igraph_vector_resize_min(&vector_)); }
+void Vector::resize_min() { SafeCall(igraph_vector_resize_min(&vector_)); }
 
-void Vector::PushBack(double value) {
+void Vector::push_back(double value) {
   SafeCall(igraph_vector_push_back(&vector_, value));
 }
 
-double Vector::PopBack() noexcept { return igraph_vector_pop_back(&vector_); }
+double Vector::pop_back() noexcept { return igraph_vector_pop_back(&vector_); }
 
-void Vector::Insert(long int pos, double value) {
+void Vector::insert(long int pos, double value) {
   SafeCall(igraph_vector_insert(&vector_, pos, value));
 }
 
-void Vector::Remove(long int pos) noexcept {
+void Vector::remove(long int pos) noexcept {
   igraph_vector_remove(&vector_, pos);
 }
 
-void Vector::Remove(long int from, long int to) noexcept {
+void Vector::remove(long int from, long int to) noexcept {
   igraph_vector_remove_section(&vector_, from, to);
 }
-
-void Vector::CopyTo(double *output) noexcept {
-  igraph_vector_copy_to(&vector_, output);
-}
-
-void Vector::Update(const Vector &input) noexcept {
-  igraph_vector_update(&vector_, &input.vector_);
-}
-
-void Vector::Append(const Vector &input) {
-  SafeCall(igraph_vector_append(&vector_, &input.vector_));
-}
-
-void Vector::Swap(long int i, long int j) noexcept {
-  SafeCall(igraph_vector_swap_elements(&vector_, i, j));
-}
-
-void Vector::Swap(Vector &b) {
-  SafeCall(igraph_vector_swap(&vector_, b.ptr()));
-}
-
-void Vector::Reverse() noexcept { SafeCall(igraph_vector_reverse(&vector_)); }
-
-void Vector::Shuffle() noexcept { SafeCall(igraph_vector_shuffle(&vector_)); }
 
 } // namespace igraph
 
