@@ -9,8 +9,6 @@
 ## -----------------------------------------------------------------------------
 ## Check for the header files
 
-MESSAGE("CA ESTAMOS")
-
 find_path (IGRAPH_INCLUDES igraph.h
   PATHS ${CMAKE_EXTRA_INCLUDES} PATH_SUFFIXES igraph/ igraph/include NO_DEFAULT_PATH
   )

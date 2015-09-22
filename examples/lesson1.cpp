@@ -9,9 +9,9 @@ int main(void) {
   using std::cout;
 
   igraph::SetSeed(42);
-  float startTime = (float)clock()/CLOCKS_PER_SEC;
+  float startTime = (float)clock() / CLOCKS_PER_SEC;
   Graph g = Graph::ErdosRenyiGame(1000, 5.0 / 1000);
-  float endTime = (float)clock()/CLOCKS_PER_SEC;
+  float endTime = (float)clock() / CLOCKS_PER_SEC;
   float timeElapsed = endTime - startTime;
   cout << "Time: " << timeElapsed << "\n";
 

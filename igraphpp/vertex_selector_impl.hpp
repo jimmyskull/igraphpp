@@ -5,6 +5,8 @@
 #error "You must include igraph.hpp first"
 #endif
 
+#include <type_traits>
+
 #include <igraph.h>
 
 #include "./exception.hpp"
@@ -59,9 +61,14 @@ VertexSelector VertexSelector::FromVector(const VectorView &vector) {
   return VertexSelector(vs);
 }
 
-template <typename... Args>
-VertexSelector VertexSelector::Small(const VectorView &vector,
-                                     Args &&... args) {
+constexpr bool all_args() { return true; }
+
+template <typename... Tail> constexpr bool all_args(bool head, Tail... tail) {
+  return head && all_args(tail...);
+}
+
+template <typename... Args, typename>
+VertexSelector VertexSelector::Small(const VectorView &vector, Args... args) {
   igraph_vs_t vs;
   SafeCall(igraph_vs_vector_small(&vs, args..., -1));
   return VertexSelector(vs);

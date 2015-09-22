@@ -5,6 +5,8 @@
 #error "You must include igraph.hpp first"
 #endif
 
+#include <type_traits>
+
 #include <igraph.h>
 
 #include "./exception.hpp"
@@ -32,8 +34,9 @@ public:
   static VertexSelector ViewVector(const VectorView &vector);
   /* Makes a copy of |vector|. */
   static VertexSelector FromVector(const VectorView &vector);
-  template <typename... Args>
-  static VertexSelector Small(const VectorView &vector, Args &&... args);
+  template <typename... Args, typename = std::enable_if_t<
+                                  all_args(std::is_same<Args, int>::value...)>>
+  static VertexSelector Small(const VectorView &vector, Args... args);
   static VertexSelector Sequence(int from, int to);
 
   igraph_vs_t *ptr();

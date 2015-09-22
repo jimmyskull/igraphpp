@@ -25,7 +25,7 @@ int main(void) {
 
   Vector degrees(graph.degrees());
   printf("Maximum degree is      %10i, vertex %2i.\n",
-        static_cast<int>(degrees.max()),
+         static_cast<int>(degrees.max()),
          static_cast<int>(degrees.which_max()));
 
   // igraph_closeness(&graph, &result, igraph_vss_all(), IGRAPH_ALL,
