@@ -177,10 +177,10 @@ public:
   Vector(double from, double to) : VectorView() {
     SafeCall(igraph_vector_init_seq(ptr(), from, to));
   }
-  explicit Vector(const Vector &other) : VectorView() {
+  Vector(const Vector &other) : VectorView() {
     SafeCall(igraph_vector_copy(ptr(), other.ptr()));
   }
-  explicit Vector(const VectorView &other) : VectorView() {
+  Vector(const VectorView &other) : VectorView() {
     SafeCall(igraph_vector_copy(ptr(), other.ptr()));
   }
   Vector(Vector &&other) : VectorView() {
