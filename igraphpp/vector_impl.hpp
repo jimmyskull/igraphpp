@@ -184,9 +184,8 @@ inline Vector::Vector(const double *data, long int length) : VectorView() {
 inline Vector::Vector(double from, double to) : VectorView() {
   SafeCall(igraph_vector_init_seq(ptr(), from, to));
 }
-inline Vector::Vector(const Vector &other) : VectorView() {
-  SafeCall(igraph_vector_copy(ptr(), other.ptr()));
-}
+inline Vector::Vector(const Vector &other)
+    : Vector(static_cast<const VectorView &>(other)) {}
 inline Vector::Vector(const VectorView &other) : VectorView() {
   SafeCall(igraph_vector_copy(ptr(), other.ptr()));
 }
