@@ -7,6 +7,8 @@ add_executable(test_suite
 	VectorView.cpp
   Vector.cpp
   VertexSelector.cpp
-  VertexIterator.cpp)
+  VertexIterator.cpp
+  EdgeSelector.cpp
+  EdgeIterator.cpp)
 
 target_link_libraries(test_suite ${IGRAPH_LIBRARIES})

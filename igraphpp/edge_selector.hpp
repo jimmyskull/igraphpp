@@ -1,0 +1,56 @@
+#ifndef IGRAPHPP_EDGE_SELECTOR_HPP_
+#define IGRAPHPP_EDGE_SELECTOR_HPP_
+
+#ifndef IGRAPHPP_IGRAPH_HPP_
+#error "You must include igraph.hpp first"
+#endif
+
+#include <type_traits>
+
+#include <igraph.h>
+
+namespace igraph {
+
+class Graph;
+
+class Vector;
+
+class EdgeSelector {
+public:
+  ~EdgeSelector();
+
+  EdgeSelector(const EdgeSelector &es);
+
+  bool is_all() const noexcept;
+
+  int size(const Graph &graph) const noexcept;
+
+  int type() const noexcept;
+
+  /* Vertex selector constructors */
+  static EdgeSelector All(EdgeOrder order = EdgeById);
+  static EdgeSelector Incident(int vid, NeighborMode mode = Out);
+  static EdgeSelector None();
+  static EdgeSelector Single(int eid);
+  static EdgeSelector FromVector(const VectorView &vector);
+  static EdgeSelector Sequence(int from, int to);
+  static EdgeSelector Pairs(const Vector &edge_vector,
+                            Directedness dir = Directed);
+  template <typename... Args, typename = std::enable_if_t<
+                                  all_args(std::is_same<Args, int>::value...)>>
+  static EdgeSelector Pairs(Directedness dir, Args... args);
+
+  const igraph_es_t &es() const { return es_; }
+  igraph_es_t *ptr() { return &es_; }
+  const igraph_es_t *ptr() const { return &es_; }
+
+protected:
+  EdgeSelector(const igraph_es_t &es);
+
+private:
+  igraph_es_t es_;
+};
+
+} // namespace igraph
+
+#endif // IGRAPHPP_EDGE_SELECTOR_HPP_

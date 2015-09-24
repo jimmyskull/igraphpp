@@ -25,6 +25,12 @@ enum Periodicity { NotPeriodic = false, Circular = true };
 
 enum Loops { NoLoops = IGRAPH_NO_LOOPS, AllowLoops = IGRAPH_LOOPS };
 
+enum EdgeOrder {
+  EdgeById = IGRAPH_EDGEORDER_ID,
+  EdgeBySourceId = IGRAPH_EDGEORDER_FROM,
+  EdgeByTargetId = IGRAPH_EDGEORDER_TO
+};
+
 static inline int SetSeed(unsigned long int seed) {
   igraph_rng_t *rng = igraph_rng_default();
   int ret = igraph_rng_seed(rng, seed);
@@ -36,11 +42,15 @@ static inline int SetSeed(unsigned long int seed) {
 #include "./vector.hpp"
 #include "./vertex_selector.hpp"
 #include "./vertex_iterator.hpp"
+#include "./edge_selector.hpp"
+#include "./edge_iterator.hpp"
 #include "./graph.hpp"
 
 #include "./vector_impl.hpp"
 #include "./vertex_selector_impl.hpp"
 #include "./vertex_iterator_impl.hpp"
+#include "./edge_selector_impl.hpp"
+#include "./edge_iterator_impl.hpp"
 #include "./graph_impl.hpp"
 
 #endif // IGRAPHPP_IGRAPH_HPP_

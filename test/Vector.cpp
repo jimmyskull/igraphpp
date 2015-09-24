@@ -3,26 +3,18 @@
 
 #include "../igraphpp/igraph.hpp"
 
-TEST_CASE("Vector - default", "[VectorView]") {
-  using igraph::Vector;
-
-  Vector v;
-  CHECK(v.size() == 0);
-  CHECK(v.empty());
-}
-
-TEST_CASE("Vector - initial size", "[VectorView]") {
-  using igraph::Vector;
-
-  Vector v(10);
-  CHECK(v.size() == 10);
-}
-
 #define N 5
 #define M 7
 
-TEST_CASE("Vector - copy", "[VectorView]") {
+TEST_CASE("Vector", "[Vector]") {
   using igraph::Vector;
+
+  Vector vempty;
+  CHECK(vempty.size() == 0);
+  CHECK(vempty.empty());
+
+  Vector vinit(10);
+  CHECK(vinit.size() == 10);
 
   double a[N] = {1, 2, 3, 4, 5};
   double b[M] = {5, 5, 1, 4, 2, 3, 7};
