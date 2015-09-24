@@ -6,7 +6,7 @@ all:
 test:
 	mkdir -p build
 	cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && $(MAKE) --no-print-directory
-	#cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && $(MAKE) --no-print-directory && valgrind ./test/test_suite -d yes
+	valgrind ./build/test/test_suite -d yes
 
 format:
 	clang-format --style=llvm -i test/*.cpp
