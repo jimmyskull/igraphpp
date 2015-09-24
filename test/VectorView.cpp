@@ -121,6 +121,9 @@ TEST_CASE("VectorView", "[VectorView]") {
   CHECK(va.contains(3));
   CHECK(vb.contains(-4));
 
+  CHECK(vb.head() == -4);
+  CHECK(vb.tail() == 10);
+
   // va = 1 2 2 3  4
   // vb = 1 2 6 9 10
   va.sort();

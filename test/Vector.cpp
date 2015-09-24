@@ -30,6 +30,9 @@ TEST_CASE("Vector - copy", "[VectorView]") {
   Vector va(a, N);
   Vector vb(a, N);
 
+  Vector seq(1, 5);
+  CHECK(va == vb);
+
   CHECK(va.size() == 5);
   va.null();
   CHECK(va[2] == 0);

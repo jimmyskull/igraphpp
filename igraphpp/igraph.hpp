@@ -35,6 +35,12 @@ static inline int SetSeed(unsigned long int seed) {
 
 #include "./vector.hpp"
 #include "./vertex_selector.hpp"
+#include "./vertex_iterator.hpp"
 #include "./graph.hpp"
+
+#include "./vector_impl.hpp"
+#include "./vertex_selector_impl.hpp"
+#include "./vertex_iterator_impl.hpp"
+#include "./graph_impl.hpp"
 
 #endif // IGRAPHPP_IGRAPH_HPP_
