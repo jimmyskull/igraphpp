@@ -1,4 +1,6 @@
 
+#include <utility>
+
 #include <catch.hpp>
 
 #include "../igraphpp/igraph.hpp"
@@ -47,4 +49,8 @@ TEST_CASE("Matrix", "[Matrix]") {
   Matrix sq(2, 2);
   mat2 = sq;
   CHECK(mat2.size() == 4);
+
+  mat = std::move(sq);
+  Matrix a(std::move(mat2));
+  Matrix b(std::move(b));
 }

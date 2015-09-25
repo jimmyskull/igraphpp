@@ -16,8 +16,8 @@ public:
   /* Constructors and destructors */
   ~Matrix();
   Matrix(long int nrow = 0, long int ncol = 0);
-  Matrix(const Matrix &other);
-  Matrix(Matrix &&other);
+  Matrix(const Matrix &matrix);
+  Matrix(Matrix &&matrix);
   Matrix &operator=(const Matrix &matrix);
   Matrix &operator=(Matrix &&matrix);
 
@@ -106,7 +106,8 @@ public:
   const igraph_matrix_t *ptr() const { return &matrix_; }
 
 private:
-  // VertexIterator(const igraph_matrix_t &vs);
+  void disown() { ptr()->ncol = -1; }
+  bool owner() const { return ptr()->ncol != -1; }
 
   igraph_matrix_t matrix_;
 };

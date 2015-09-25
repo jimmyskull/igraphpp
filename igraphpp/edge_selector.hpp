@@ -18,13 +18,10 @@ class Vector;
 class EdgeSelector {
 public:
   ~EdgeSelector();
-
   EdgeSelector(const EdgeSelector &es);
 
   bool is_all() const noexcept;
-
   int size(const Graph &graph) const noexcept;
-
   int type() const noexcept;
 
   /* Vertex selector constructors */

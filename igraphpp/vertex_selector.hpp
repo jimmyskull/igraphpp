@@ -26,13 +26,10 @@ class Graph;
 class VertexSelector {
 public:
   ~VertexSelector();
-
   VertexSelector(const VertexSelector &vs);
 
   bool is_all() const noexcept;
-
   int size(const Graph &graph) const noexcept;
-
   int type() const noexcept;
 
   /* Vertex selector constructors */
@@ -49,9 +46,7 @@ public:
   static VertexSelector Small(Args... args);
 
   const igraph_vs_t &vs() const { return vs_; }
-
   igraph_vs_t *ptr() { return &vs_; }
-
   const igraph_vs_t *ptr() const { return &vs_; }
 
 private:

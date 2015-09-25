@@ -12,26 +12,29 @@
 namespace igraph {
 
 /* Constructors and destructors */
-inline Matrix::~Matrix() { igraph_matrix_destroy(ptr()); }
+inline Matrix::~Matrix() {
+  if (owner())
+    igraph_matrix_destroy(ptr());
+}
 inline Matrix::Matrix(long int nrow, long int ncol) {
   SafeCall(igraph_matrix_init(ptr(), nrow, ncol));
 }
-inline Matrix::Matrix(const Matrix &other) {
-  SafeCall(igraph_matrix_copy(ptr(), other.ptr()));
+inline Matrix::Matrix(const Matrix &matrix) {
+  SafeCall(igraph_matrix_copy(ptr(), matrix.ptr()));
 }
-inline Matrix::Matrix(Matrix &&other) : matrix_(*other.ptr()) {
-  igraph_matrix_destroy(ptr());
-  other.ptr()->ncol = -1;
+inline Matrix::Matrix(Matrix &&matrix) {
+  matrix_ = *matrix.ptr();
+  matrix.disown();
 }
 inline Matrix &Matrix::operator=(const Matrix &matrix) {
-  igraph_matrix_destroy(ptr());
+  this->~Matrix();
   SafeCall(igraph_matrix_copy(ptr(), matrix.ptr()));
   return *this;
 }
 inline Matrix &Matrix::operator=(Matrix &&matrix) {
-  igraph_matrix_destroy(ptr());
+  this->~Matrix();
   *ptr() = *matrix.ptr();
-  matrix.ptr()->ncol = -1;
+  matrix.disown();
   return *this;
 }
 

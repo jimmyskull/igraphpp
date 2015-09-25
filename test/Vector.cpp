@@ -1,4 +1,6 @@
 
+#include <utility>
+
 #include <catch.hpp>
 
 #include "../igraphpp/igraph.hpp"
@@ -87,4 +89,8 @@ TEST_CASE("Vector", "[Vector]") {
   CHECK(intersect[2] == 3);
   CHECK(intersect[3] == 4);
   CHECK(intersect[4] == 5);
+
+  difference = std::move(intersect);
+  Vector x(std::move(difference));
+  Vector s(std::move(x));
 }
