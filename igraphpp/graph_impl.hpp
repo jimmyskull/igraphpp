@@ -16,7 +16,7 @@
 namespace igraph {
 
 inline Graph::~Graph() {
-  if (VECTOR(graph_.from) != NULL)
+  if (graph_destroy_ && VECTOR(graph_.from) != NULL)
     SafeCall(igraph_destroy(&graph_));
 }
 

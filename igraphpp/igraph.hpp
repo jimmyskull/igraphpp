@@ -44,6 +44,8 @@ static inline int SetSeed(unsigned long int seed) {
 #include "./vertex_iterator.hpp"
 #include "./edge_selector.hpp"
 #include "./edge_iterator.hpp"
+#include "./vectorptr.hpp"
+#include "./matrix.hpp"
 #include "./graph.hpp"
 
 #include "./vector_impl.hpp"
@@ -51,6 +53,7 @@ static inline int SetSeed(unsigned long int seed) {
 #include "./vertex_iterator_impl.hpp"
 #include "./edge_selector_impl.hpp"
 #include "./edge_iterator_impl.hpp"
+#include "./matrix_impl.hpp"
 #include "./graph_impl.hpp"
 
 #endif // IGRAPHPP_IGRAPH_HPP_

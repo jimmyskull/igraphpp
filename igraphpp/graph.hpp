@@ -62,15 +62,23 @@ public:
                               Directedness dir = Undirected,
                               Loops loops = NoLoops);
 
+  void set_graph_destroy(bool value) { graph_destroy_ = value; }
+
   igraph_t *ptr() { return &graph_; }
 
   const igraph_t *ptr() const { return &graph_; }
+
+  Graph(const igraph_t *graph) {
+    graph_ = *graph;
+    set_graph_destroy(false);
+  }
 
 protected:
   Graph(const igraph_t &graph);
 
 private:
   igraph_t graph_;
+  bool graph_destroy_ = true;
 };
 
 } // namespace igraph
