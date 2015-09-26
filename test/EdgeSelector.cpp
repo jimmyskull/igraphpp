@@ -1,4 +1,6 @@
 
+#include <vector>
+
 #include <catch.hpp>
 
 #include "../igraphpp/igraph.hpp"
@@ -28,6 +30,7 @@ TEST_CASE("EdgeSelector", "[EdgeSelector]") {
   CHECK_FALSE(vsingle.is_all());
 
   Vector v(1, 10);
+  CHECK(v.size() == 10);
   EdgeSelector vvector = EdgeSelector::FromVector(v);
   EdgeSelector vseq = EdgeSelector::Sequence(0, 3);
   EdgeSelector copy(vseq);
@@ -41,4 +44,14 @@ TEST_CASE("EdgeSelector", "[EdgeSelector]") {
 
   EdgeSelector vseqall = EdgeSelector::Sequence(0, 9);
   CHECK_FALSE(vseqall.is_all());
+
+  EdgeSelector einit({1, 2, 2, 1});
+  CHECK(einit.size(g) == 4);
+
+  std::vector<double> vd = {0, 1, 1, 2, 3, 4};
+  EdgeSelector einit2(vd.begin(), vd.end());
+  CHECK(einit2.size(g) == 6);
+
+  EdgeSelector einit3({6, 7, 8, 9, 0, 1, 0, 2});
+  CHECK(einit3.size(g) == 8);
 }

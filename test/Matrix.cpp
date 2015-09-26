@@ -29,6 +29,7 @@ TEST_CASE("Matrix", "[Matrix]") {
       mat(i, j) = i + j * N + 1;
 
   Vector seq(1, N * N);
+  CHECK(seq.size() == N * N);
   double flat[N * N];
   mat.copy_to(flat);
 

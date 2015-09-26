@@ -11,6 +11,7 @@ add_executable(test_suite
   EdgeSelector.cpp
   EdgeIterator.cpp
   VectorPtr.cpp
-  Matrix.cpp)
+  Matrix.cpp
+  Graph.cpp)
 
 target_link_libraries(test_suite ${IGRAPH_LIBRARIES})

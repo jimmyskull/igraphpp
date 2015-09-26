@@ -16,49 +16,39 @@
 namespace igraph {
 
 inline Graph::~Graph() {
-  if (graph_destroy_ && VECTOR(graph_.from) != NULL)
-    SafeCall(igraph_destroy(&graph_));
+  if (owner())
+    SafeCall(igraph_destroy(ptr()));
 }
-
-inline Graph::Graph(int vertices, Directedness dir) {
-  SafeCall(igraph_empty(&graph_, vertices, dir));
+inline Graph::Graph(long int vertices, Directedness dir) {
+  SafeCall(igraph_empty(ptr(), vertices, dir));
 }
-
-inline Graph::Graph(const VectorView &vector, int vertices, bool directed) {
-  SafeCall(igraph_create(&graph_, vector.ptr(), vertices, directed));
+inline Graph::Graph(const VectorView &edges, long int vertices,
+                    Directedness dir) {
+  SafeCall(igraph_create(ptr(), edges.ptr(), vertices, dir));
 }
-
 inline Graph::Graph(const Graph &other) {
   SafeCall(igraph_copy(&graph_, &other.graph_));
 }
-
 inline Graph::Graph(Graph &&other) {
-  graph_ = other.graph_;
-#ifndef NDEBUG
-  std::memset(&other.graph_, 0, sizeof(other.graph_));
-#endif
-  VECTOR(other.graph_.from) = NULL;
+  *ptr() = *other.ptr();
+  other.disown();
 }
 
 inline Graph &Graph::operator=(const Graph &other) {
   if (this == &other)
     return *this;
-  SafeCall(igraph_destroy(&graph_));
+  if (owner())
+    SafeCall(igraph_destroy(&graph_));
   SafeCall(igraph_copy(&graph_, &other.graph_));
   return *this;
 }
-
 inline Graph &Graph::operator=(Graph &&other) {
-  graph_ = other.graph_;
-#ifndef NDEBUG
-  std::memset(&other.graph_, 0, sizeof(other.graph_));
-#endif
-  other.graph_.from.stor_begin = NULL;
+  *ptr() = *other.ptr();
+  other.disown();
   return *this;
 }
 
 inline int Graph::vcount() const noexcept { return igraph_vcount(&graph_); }
-
 inline int Graph::ecount() const noexcept { return igraph_ecount(&graph_); }
 
 inline bool Graph::is_directed() const noexcept {
@@ -81,13 +71,13 @@ inline int Graph::diameter(Directedness directed, bool unconnected) const {
   return length;
 }
 
-inline Vector Graph::degrees(NeighborMode mode, Loops loops) const {
-  Vector v;
-  bool lps = (loops == AllowLoops);
-  SafeCall(igraph_degree(&graph_, v.ptr(), igraph_vss_all(),
-                         static_cast<igraph_neimode_t>(mode), lps));
-  return std::move(v);
-}
+// inline Vector Graph::degrees(NeighborMode mode, Loops loops) const {
+//   Vector v;
+//   bool lps = (loops == AllowLoops);
+//   SafeCall(igraph_degree(&graph_, v.ptr(), igraph_vss_all(),
+//                          static_cast<igraph_neimode_t>(mode), lps));
+//   return std::move(v);
+// }
 
 inline Graph &Graph::AddEdge(int from, int to) {
   SafeCall(igraph_add_edge(&graph_, from, to));

@@ -1,11 +1,15 @@
 #ifndef IGRAPHPP_IGRAPH_HPP_
 #define IGRAPHPP_IGRAPH_HPP_
 
+#include <utility>
+
 #include <igraph.h>
 
 #include "./exception.hpp"
 
 namespace igraph {
+
+using Edge = std::pair<int, int>;
 
 enum Directedness {
   Undirected = IGRAPH_UNDIRECTED,

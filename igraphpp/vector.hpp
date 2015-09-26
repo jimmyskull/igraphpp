@@ -5,9 +5,13 @@
 #error "You must include igraph.hpp first"
 #endif
 
+#include <initializer_list>
+#include <type_traits>
+
 #include <igraph.h>
 
 #include "./exception.hpp"
+#include "./util.hpp"
 
 namespace igraph {
 
@@ -102,6 +106,10 @@ public:
   explicit Vector(int long size = 0);
   Vector(const double *data, long int length);
   Vector(double from, double to);
+  Vector(std::initializer_list<double> list);
+  template <typename Iterator, typename = typename std::enable_if<
+                                   util::is_iterator<Iterator>::value>::type>
+  Vector(Iterator begin, Iterator end);
   Vector(const Vector &other);
   Vector(const VectorView &other);
   Vector(Vector &&other);

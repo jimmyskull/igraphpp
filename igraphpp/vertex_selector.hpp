@@ -5,21 +5,13 @@
 #error "You must include igraph.hpp first"
 #endif
 
-#include <type_traits>
+#include <initializer_list>
 
 #include <igraph.h>
 
+#include "./util.hpp"
+
 namespace igraph {
-
-namespace {
-
-constexpr bool all_args() { return true; }
-
-template <typename... Tail> constexpr bool all_args(bool head, Tail... tail) {
-  return head && all_args(tail...);
-}
-
-} // namespace
 
 class Graph;
 
@@ -27,6 +19,11 @@ class VertexSelector {
 public:
   ~VertexSelector();
   VertexSelector(const VertexSelector &vs);
+  VertexSelector(std::initializer_list<double> list);
+  template <typename Iterator, typename = typename std::enable_if<
+                                   util::is_iterator<Iterator>::value>::type>
+  VertexSelector(Iterator begin, Iterator end);
+  VertexSelector(const VectorView &vector);
 
   bool is_all() const noexcept;
   int size(const Graph &graph) const noexcept;
@@ -38,11 +35,11 @@ public:
   static VertexSelector NonAdjacent(int vid, NeighborMode mode = Out);
   static VertexSelector None();
   static VertexSelector Single(int vid);
+  // VectorView will not copy the contents of |vector|.
   static VertexSelector FromVector(const VectorView &vector);
   static VertexSelector Sequence(int from, int to);
-
-  template <typename... Args, typename = std::enable_if_t<
-                                  all_args(std::is_same<Args, int>::value...)>>
+  template <typename... Args, typename = std::enable_if_t<util::all_args(
+                                  std::is_same<Args, int>::value...)>>
   static VertexSelector Small(Args... args);
 
   const igraph_vs_t &vs() const { return vs_; }

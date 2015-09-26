@@ -9,6 +9,8 @@
 
 #include <igraph.h>
 
+#include "./util.hpp"
+
 namespace igraph {
 
 class Graph;
@@ -19,6 +21,11 @@ class EdgeSelector {
 public:
   ~EdgeSelector();
   EdgeSelector(const EdgeSelector &es);
+  EdgeSelector(std::initializer_list<double> list);
+  template <typename Iterator, typename = typename std::enable_if<
+                                   util::is_iterator<Iterator>::value>::type>
+  EdgeSelector(Iterator begin, Iterator end);
+  EdgeSelector(const VectorView &vector);
 
   bool is_all() const noexcept;
   int size(const Graph &graph) const noexcept;
@@ -33,8 +40,8 @@ public:
   static EdgeSelector Sequence(int from, int to);
   static EdgeSelector Pairs(const Vector &edge_vector,
                             Directedness dir = Directed);
-  template <typename... Args, typename = std::enable_if_t<
-                                  all_args(std::is_same<Args, int>::value...)>>
+  template <typename... Args, typename = std::enable_if_t<util::all_args(
+                                  std::is_same<Args, int>::value...)>>
   static EdgeSelector Pairs(Directedness dir, Args... args);
 
   const igraph_es_t &es() const { return es_; }

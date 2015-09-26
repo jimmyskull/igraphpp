@@ -184,6 +184,23 @@ inline Vector::Vector(const double *data, long int length) : VectorView() {
 inline Vector::Vector(double from, double to) : VectorView() {
   SafeCall(igraph_vector_init_seq(ptr(), from, to));
 }
+inline Vector::Vector(std::initializer_list<double> list) {
+  SafeCall(igraph_vector_init(ptr(), 0));
+  reserve(static_cast<long int>(list.size()));
+  auto begin = list.begin();
+  auto end = list.end();
+  for (; begin != end; ++begin) {
+    push_back(static_cast<double>(*begin));
+  }
+}
+template <typename Iterator, typename>
+Vector::Vector(Iterator begin, Iterator end)
+    : VectorView() {
+  SafeCall(igraph_vector_init(ptr(), 0));
+  for (; begin != end; ++begin) {
+    push_back(static_cast<double>(*begin));
+  }
+}
 inline Vector::Vector(const Vector &other)
     : Vector(static_cast<const VectorView &>(other)) {}
 inline Vector::Vector(const VectorView &other) : VectorView() {

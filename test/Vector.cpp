@@ -24,7 +24,11 @@ TEST_CASE("Vector", "[Vector]") {
   Vector va(a, N);
   Vector vb(a, N);
 
+  Vector lst({1, 10});
+  CHECK(lst.size() == 2);
+
   Vector seq(1, 5);
+  CHECK(seq.size() == 5);
   CHECK(va == vb);
 
   CHECK(va.size() == 5);
