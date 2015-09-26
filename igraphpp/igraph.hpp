@@ -21,6 +21,8 @@ enum Connectedness {
   StronglyConnected = IGRAPH_STRONG
 };
 
+enum MultiEdges { IgnoreMultiEdges = false, OneOfMultiEdges = true };
+
 enum NeighborMode { Out = IGRAPH_OUT, In = IGRAPH_IN, All = IGRAPH_ALL };
 
 enum Mutuality { NotMutual = false, MutualConnections = true };

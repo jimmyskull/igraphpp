@@ -9,9 +9,12 @@
 #include <cstring>
 #endif
 
+#include <initializer_list>
+
 #include <igraph.h>
 
 #include "./exception.hpp"
+#include "./util.hpp"
 
 namespace igraph {
 
@@ -26,6 +29,12 @@ public:
   // TODO: Empty graph with attributes
   Graph(const VectorView &edges, long int vertices = 0,
         Directedness dir = Undirected);
+  Graph(std::initializer_list<double> edges, long int vertices = 0,
+        Directedness dir = Undirected);
+  template <typename Iterator, typename = typename std::enable_if<
+                                   util::is_iterator<Iterator>::value>::type>
+  Graph(Iterator edges_begin, Iterator edges_end, long int vertices = 0,
+        Directedness dir = Undirected);
   Graph(const Graph &other);
   Graph(Graph &&other);
 
@@ -35,23 +44,34 @@ public:
   /* Basic query operations */
   int vcount() const noexcept;
   int ecount() const noexcept;
-  // Edge edge(int eid) const noexcept;
-  // int eid(int from, int to, Directedness directed = Undirected) const;
-  // Vector pairs_eids(const Vector &pairs, Directedness directed = Undirected,
-  //                   bool fail_if_not_connected = false,
-  //                   bool multiedges = false) const;
-  // Vector path_eids(const Vector &path, Directedness directed = Undirected,
-  //                  bool fail_if_not_connected = false,
-  //                  bool multiedges = false) const;
-  // Vector eids(const Vector &pairs, const Vector &path,
-  //             Directedness directed = Undirected,
-  //             bool fail_if_not_connected = false,
-  //             bool multiedges = false) const;
-  // Vector neighbors(int vertex, Directedness directed = Undirected) const;
-  // Vector incident(int vertex, Directedness directed = Undirected) const;
+  Edge edge(int eid) const;
+  int eid(int from, int to, Directedness dir = Undirected) const;
+  // Edge eids between pairs of vertices
+  Vector pairs_eids(const VectorView &pairs, Directedness dir = Directed,
+                    MultiEdges multiedges = IgnoreMultiEdges) const;
+  Vector pairs_eids(std::initializer_list<double> pairs,
+                    Directedness dir = Directed,
+                    MultiEdges multiedges = IgnoreMultiEdges) const;
+  // Edges composing a path
+  Vector path_eids(const VectorView &path, Directedness dir = Directed,
+                   MultiEdges multiedges = IgnoreMultiEdges) const;
+  Vector path_eids(std::initializer_list<double> path,
+                   Directedness dir = Directed,
+                   MultiEdges multiedges = IgnoreMultiEdges) const;
+  // Concatenation of |pairs_eids()| and |path_eids()|
+  Vector eids(const VectorView &pairs, const VectorView &path,
+              Directedness dir = Directed,
+              MultiEdges multiedges = IgnoreMultiEdges) const;
+  Vector eids(std::initializer_list<double> pairs,
+              std::initializer_list<double> path, Directedness dir = Directed,
+              MultiEdges multiedges = IgnoreMultiEdges) const;
+  Vector neighbors(int vertex, NeighborMode mode = Out) const;
+  Vector incident(int vertex, NeighborMode mode = Out) const;
   bool is_directed() const noexcept;
-  // Vector degree(const VertexSelector &vids,
-  //               NeighborMode mode = All, Loops loops = AllowLoops) const;
+  Vector degree(const VertexSelector &vids, NeighborMode mode = Out,
+                Loops loops = NoLoops) const;
+  Vector degree(std::initializer_list<double> vids, NeighborMode mode = Out,
+                Loops loops = NoLoops) const;
 
   /* Adding and deleting vertices and edges */
   Graph &AddEdge(int from, int to);
@@ -78,25 +98,23 @@ public:
                               Directedness dir = Undirected,
                               Loops loops = NoLoops);
 
-  void set_graph_destroy(bool value) { graph_destroy_ = value; }
-
   igraph_t *ptr() { return &graph_; }
   const igraph_t *ptr() const { return &graph_; }
 
   Graph(const igraph_t *graph) {
     graph_ = *graph;
-    set_graph_destroy(false);
+    disown();
   }
 
 protected:
   Graph(const igraph_t &graph);
 
 private:
-  void disown() { VECTOR(graph_.from) = NULL; }
-  bool owner() const { return graph_destroy_ && VECTOR(graph_.from) != NULL; }
+  void disown() { owner_ = false; }
+  bool owner() const { return owner_; }
 
   igraph_t graph_;
-  bool graph_destroy_ = true;
+  bool owner_ = true;
 };
 
 } // namespace igraph
