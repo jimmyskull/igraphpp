@@ -79,8 +79,8 @@ public:
   Vector neighbors(int vertex, NeighborMode mode = Out) const;
   Vector incident(int vertex, NeighborMode mode = Out) const;
   bool is_directed() const noexcept;
-  Vector degree(const VertexSelector &vids, NeighborMode mode = Out,
-                Loops loops = NoLoops) const;
+  Vector degree(const VertexSelector &vids = VertexSelector::All(),
+                NeighborMode mode = Out, Loops loops = NoLoops) const;
   Vector degree(std::initializer_list<double> vids, NeighborMode mode = Out,
                 Loops loops = NoLoops) const;
 
