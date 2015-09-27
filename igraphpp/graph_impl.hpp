@@ -164,7 +164,7 @@ inline Graph &Graph::add_edge(int from, int to) {
   SafeCall(igraph_add_edge(&graph_, from, to));
   return *this;
 }
-inline Graph &Graph::add_edges(const Vector &edges) {
+inline Graph &Graph::add_edges(const VectorView &edges) {
   SafeCall(igraph_add_edges(&graph_, edges.ptr(), NULL));
   return *this;
 }
@@ -191,29 +191,6 @@ inline void Graph::delete_vertices(std::initializer_list<double> vertices) {
   SafeCall(igraph_delete_vertices(ptr(), sel.vs()));
 }
 
-inline int Graph::diameter(Directedness directed, bool unconnected) const {
-  int length = 0;
-  int ret = igraph_diameter(&graph_, &length, NULL, NULL, NULL, directed,
-                            unconnected);
-  SafeCall(ret);
-  return length;
-}
-
-inline bool Graph::is_connected(Connectedness mode) const {
-  igraph_bool_t connected;
-  igraph_connectedness_t m = static_cast<igraph_connectedness_t>(mode);
-  int ret = igraph_is_connected(&graph_, &connected, m);
-  SafeCall(ret);
-  return static_cast<bool>(connected);
-}
-
-inline double Graph::AveragePathLength(Directedness directed,
-                                       bool unconnected) const {
-  double ret;
-  SafeCall(igraph_average_path_length(&graph_, &ret, directed, unconnected));
-  return ret;
-}
-
 inline Graph Graph::AdjacencyMatrix(Matrix &adjmatrix,
                                     AdjacencyMatrixMode mode) {
   igraph_t graph;
@@ -227,8 +204,9 @@ inline Graph Graph::Star(int vertices, StarMode mode, int center_vertex) {
                        center_vertex));
   return Graph(graph);
 }
-inline Graph Graph::Lattice(const Vector &dimension, int nei, Directedness dir,
-                            Mutuality mutual, Periodicity periodicity) {
+inline Graph Graph::Lattice(const VectorView &dimension, int nei,
+                            Directedness dir, Mutuality mutual,
+                            Periodicity periodicity) {
   igraph_t graph;
   SafeCall(
       igraph_lattice(&graph, dimension.ptr(), nei, dir, mutual, periodicity));
@@ -318,9 +296,10 @@ inline Graph Graph::Barabasi(int vertices, double power, int m, bool outpref,
       static_cast<igraph_barabasi_algorithm_t>(algo), start));
   return Graph(graph);
 }
-inline Graph Graph::Barabasi(int vertices, double power, const Vector &outseq,
-                             bool outpref, double A, Directedness dir,
-                             BarabasiAlgorithm algo, const Graph &start_graph) {
+inline Graph Graph::Barabasi(int vertices, double power,
+                             const VectorView &outseq, bool outpref, double A,
+                             Directedness dir, BarabasiAlgorithm algo,
+                             const Graph &start_graph) {
   igraph_t graph;
   const igraph_t *start = start_graph.vcount() ? start_graph.ptr() : NULL;
   SafeCall(igraph_barabasi_game(
@@ -468,7 +447,7 @@ inline Graph Graph::RecentDegree(int vertices, double power, int window,
   return Graph(graph);
 }
 inline Graph Graph::RecentDegree(int vertices, double power, int window, int m,
-                                 const Vector &outseq, bool outpref,
+                                 const VectorView &outseq, bool outpref,
                                  double zero_appeal, Directedness dir) {
   igraph_t graph;
   SafeCall(igraph_recent_degree_game(&graph, vertices, power, window, m,
@@ -486,7 +465,7 @@ inline Graph Graph::BarabasiAging(int vertices, int m, bool outpref,
       zero_deg_appeal, zero_age_appeal, deg_coef, age_coef, dir));
   return Graph(graph);
 }
-inline Graph Graph::BarabasiAging(int vertices, const Vector &outseq,
+inline Graph Graph::BarabasiAging(int vertices, const VectorView &outseq,
                                   bool outpref, double pa_exp, double aging_exp,
                                   int aging_bin, double zero_deg_appeal,
                                   double zero_age_appeal, double deg_coef,
@@ -507,7 +486,7 @@ inline Graph Graph::RecentDegreeAging(int vertices, int m, bool outpref,
                                            time_window, zero_appeal, dir));
   return Graph(graph);
 }
-inline Graph Graph::RecentDegreeAging(int vertices, const Vector &outseq,
+inline Graph Graph::RecentDegreeAging(int vertices, const VectorView &outseq,
                                       bool outpref, double pa_exp,
                                       double aging_exp, int aging_bin,
                                       double time_window, double zero_appeal,
@@ -518,13 +497,167 @@ inline Graph Graph::RecentDegreeAging(int vertices, const Vector &outseq,
       time_window, zero_appeal, dir));
   return Graph(graph);
 }
-inline Graph Graph::CitedType(int vertices, const Vector &types,
-                              const Vector &pref, int edges_per_step,
+inline Graph Graph::CitedType(int vertices, const VectorView &types,
+                              const VectorView &pref, int edges_per_step,
                               Directedness dir) {
   igraph_t graph;
   SafeCall(igraph_cited_type_game(&graph, vertices, types.ptr(), pref.ptr(),
                                   edges_per_step, dir));
   return Graph(graph);
+}
+
+/* Graph, vertex, and edge attributes */
+
+/* Structural properties of graphs */
+/* Basic properties */
+inline bool Graph::are_connected(int v1, int v2) const {
+  int connected;
+  SafeCall(igraph_are_connected(ptr(), v1, v2, &connected));
+  return connected != 0;
+}
+
+/* Shortest path related functions */
+inline Matrix Graph::shortest_paths(const VertexSelector &from,
+                                    const VertexSelector &to,
+                                    NeighborMode mode) const {
+  Matrix result(from.size(*this), to.size(*this));
+  SafeCall(igraph_shortest_paths(ptr(), result.ptr(), from.vs(), to.vs(),
+                                 static_cast<igraph_neimode_t>(mode)));
+  return result;
+}
+inline double Graph::shortest_paths(int from, int to, NeighborMode mode) const {
+  return shortest_paths(VertexSelector::Single(from),
+                        VertexSelector::Single(to), mode).at(0, 0);
+}
+inline Matrix Graph::shortest_paths_dijkstra(const VertexSelector &from,
+                                             const VertexSelector &to,
+                                             const VectorView &weights,
+                                             NeighborMode mode) const {
+  Matrix result(from.size(*this), to.size(*this));
+  SafeCall(igraph_shortest_paths_dijkstra(ptr(), result.ptr(), from.vs(),
+                                          to.vs(), weights.ptr(),
+                                          static_cast<igraph_neimode_t>(mode)));
+  return result;
+}
+inline double Graph::shortest_paths_dijkstra(int from, int to,
+                                             const VectorView &weights,
+                                             NeighborMode mode) const {
+  return shortest_paths_dijkstra(VertexSelector::Single(from),
+                                 VertexSelector::Single(to), weights,
+                                 mode).at(0, 0);
+}
+inline Matrix Graph::shortest_paths_bellman_ford(const VertexSelector &from,
+                                                 const VertexSelector &to,
+                                                 const VectorView &weights,
+                                                 NeighborMode mode) const {
+  Matrix result(from.size(*this), to.size(*this));
+  SafeCall(igraph_shortest_paths_bellman_ford(
+      ptr(), result.ptr(), from.vs(), to.vs(), weights.ptr(),
+      static_cast<igraph_neimode_t>(mode)));
+  return result;
+}
+inline double Graph::shortest_paths_bellman_ford(int from, int to,
+                                                 const VectorView &weights,
+                                                 NeighborMode mode) const {
+  return shortest_paths_bellman_ford(VertexSelector::Single(from),
+                                     VertexSelector::Single(to), weights,
+                                     mode).at(0, 0);
+}
+inline Matrix Graph::shortest_paths_johnson(const VertexSelector &from,
+                                            const VertexSelector &to,
+                                            const VectorView &weights) const {
+  Matrix result(from.size(*this), to.size(*this));
+  SafeCall(igraph_shortest_paths_johnson(ptr(), result.ptr(), from.vs(),
+                                         to.vs(), weights.ptr()));
+  return result;
+}
+inline double Graph::shortest_paths_johnson(int from, int to,
+                                            const VectorView &weights) const {
+  return shortest_paths_johnson(VertexSelector::Single(from),
+                                VertexSelector::Single(to), weights).at(0, 0);
+}
+// Skipped igraph_get_shortest_paths
+// Skipped igraph_get_shortest_path
+// Skipped igraph_get_shortest_paths_dijkstra
+// Skipped igraph_get_shortest_path_dijkstra
+// Skipped igraph_get_all_shortest_paths
+// Skipped igraph_get_all_shortest_paths_dijkstra
+inline double Graph::average_path_length(Directedness dir,
+                                         bool unconnected) const {
+  double ret;
+  SafeCall(igraph_average_path_length(&graph_, &ret, dir, unconnected));
+  return ret;
+}
+inline Vector Graph::path_length_hist(Directedness dir,
+                                      double *unconnected) const {
+  Vector result;
+  SafeCall(igraph_path_length_hist(ptr(), result.ptr(), unconnected, dir));
+  return result;
+}
+inline int Graph::diameter(int *source_vertex, int *target_vertex,
+                           Directedness dir, bool unconnected) const {
+  int length = 0;
+  SafeCall(igraph_diameter(&graph_, &length, source_vertex, target_vertex, NULL,
+                           dir, unconnected));
+  return length;
+}
+inline int Graph::diameter(VectorView &path, Directedness dir,
+                           bool unconnected) const {
+  int length = 0;
+  SafeCall(igraph_diameter(&graph_, &length, NULL, NULL, path.ptr(), dir,
+                           unconnected));
+  return length;
+}
+inline double Graph::diameter_dijkstra(const VectorView &weights,
+                                       int *source_vertex, int *target_vertex,
+                                       Directedness dir,
+                                       bool unconnected) const {
+  double result = 0;
+  SafeCall(igraph_diameter_dijkstra(&graph_, weights.ptr(), &result,
+                                    source_vertex, target_vertex, NULL, dir,
+                                    unconnected));
+  return result;
+}
+inline double Graph::diameter_dijkstra(const VectorView &weights,
+                                       VectorView &path, Directedness dir,
+                                       bool unconnected) const {
+  double result = 0;
+  SafeCall(igraph_diameter_dijkstra(&graph_, weights.ptr(), &result, NULL, NULL,
+                                    path.ptr(), dir, unconnected));
+  return result;
+}
+inline int Graph::girth() const {
+  int girth;
+  SafeCall(igraph_girth(ptr(), &girth, NULL));
+  return girth;
+}
+inline int Graph::girth(Vector &circle) const {
+  int girth;
+  SafeCall(igraph_girth(ptr(), &girth, circle.ptr()));
+  return girth;
+}
+inline Vector Graph::eccentricity(const VertexSelector &vids,
+                                  NeighborMode mode) const {
+  Vector result;
+  SafeCall(igraph_eccentricity(ptr(), result.ptr(), vids.vs(),
+                               static_cast<igraph_neimode_t>(mode)));
+  return result;
+}
+inline Vector Graph::eccentricity(int vertex, NeighborMode mode) const {
+  return eccentricity(VertexSelector::Single(vertex), mode);
+}
+inline double Graph::radius(NeighborMode mode) const {
+  double radius;
+  SafeCall(igraph_radius(ptr(), &radius, static_cast<igraph_neimode_t>(mode)));
+  return radius;
+}
+
+inline bool Graph::is_connected(Connectedness mode) const {
+  igraph_bool_t connected;
+  igraph_connectedness_t m = static_cast<igraph_connectedness_t>(mode);
+  int ret = igraph_is_connected(&graph_, &connected, m);
+  SafeCall(ret);
+  return static_cast<bool>(connected);
 }
 
 inline Graph::Graph(const igraph_t &graph) : graph_(graph) {}

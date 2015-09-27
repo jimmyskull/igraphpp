@@ -250,3 +250,69 @@ TEST_CASE("Graph — randomized graph generators", "[Graph]") {
   // RecentDegreeAging
   // CitedType
 }
+
+TEST_CASE("Graph — basic properties", "[Graph]") {
+  using igraph::Graph;
+
+  Graph g{{0, 1, 0, 2}};
+  CHECK(g.are_connected(0, 1));
+  CHECK_FALSE(g.are_connected(1, 2));
+}
+
+TEST_CASE("Graph — shortest path related functions", "[Graph]") {
+  using igraph::Graph;
+  using igraph::Matrix;
+  using igraph::VertexSelector;
+  using igraph::Vector;
+
+  Graph g{{0, 1, 0, 2, 1, 3}};
+  double shortestpath = g.shortest_paths(0, 3);
+  CHECK(shortestpath == 2);
+
+  Matrix spmat =
+      g.shortest_paths(VertexSelector::Single(0), VertexSelector::Single(3));
+  CHECK(spmat(0, 0) == 2);
+
+  Matrix mat = g.shortest_paths(VertexSelector::All(), VertexSelector::All());
+  CHECK(mat.nrow() == 4);
+  CHECK(mat.ncol() == 4);
+  CHECK(mat == Matrix({0, 1, 1, 2, 1, 0, 2, 1, 1, 2, 0, 3, 2, 1, 3, 0}, 4));
+
+  g.add_edge(0, 3);
+  CHECK(g.shortest_paths_dijkstra(0, 3, Vector({1, 1, 1, 5})) == 2);
+  CHECK(g.shortest_paths_dijkstra(0, 3, Vector({1, 1, 1, 1})) == 1);
+  CHECK(g.shortest_paths_bellman_ford(0, 3, Vector({1, 1, 1, 5})) == 2);
+  CHECK(g.shortest_paths_bellman_ford(0, 3, Vector({2, 1, 1, 0})) == 0);
+  CHECK(g.shortest_paths_johnson(0, 3, Vector({1, 1, 1, 5})) == 2);
+  CHECK(g.shortest_paths_johnson(0, 3, Vector({2, 1, 1, 0})) == 0);
+
+  // Skipped igraph_get_shortest_paths
+  // Skipped igraph_get_shortest_path
+  // Skipped igraph_get_shortest_paths_dijkstra
+  // Skipped igraph_get_shortest_path_dijkstra
+  // Skipped igraph_get_all_shortest_paths
+  // Skipped igraph_get_all_shortest_paths_dijkstra
+
+  CHECK(g.average_path_length() == Approx(1.33333));
+  Vector hist = g.path_length_hist();
+  CHECK(hist == Vector({4, 2}));
+  int pfrom, pto;
+  CHECK(g.diameter(&pfrom, &pto) == 2);
+  CHECK(pfrom == 1);
+  CHECK(pto == 2);
+  Vector spath;
+  CHECK(g.diameter(spath) == 2);
+  CHECK(spath == Vector({1, 0, 2}));
+  CHECK(spath.head() == 1);
+  CHECK(spath.tail() == 2);
+
+  CHECK(g.diameter_dijkstra(Vector({0.5, 0.5, 1, 1})) == 1.5);
+
+  Vector circle;
+  CHECK(g.girth(circle) == 3);
+  CHECK(circle.size() == 3);
+  CHECK(circle == Vector({1, 0, 3}));
+
+  CHECK(g.eccentricity(VertexSelector::All()) == Vector({1, 2, 2, 2}));
+  CHECK(g.radius() == 1);
+}

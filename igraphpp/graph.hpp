@@ -75,7 +75,7 @@ public:
 
   /* Adding and deleting vertices and edges */
   Graph &add_edge(int from, int to);
-  Graph &add_edges(const Vector &edges);
+  Graph &add_edges(const VectorView &edges);
   Graph &add_edges(std::initializer_list<double> edges);
   Graph &add_vertices(int number_of_vertices);
   void delete_edges(const EdgeSelector &edges);
@@ -83,21 +83,14 @@ public:
   void delete_vertices(const VertexSelector &vertices);
   void delete_vertices(std::initializer_list<double> vertices);
 
-  bool is_connected(Connectedness mode = WeaklyConnected) const;
-
-  int diameter(Directedness directed = Directed, bool unconnected = true) const;
-
-  double AveragePathLength(Directedness directed = Directed,
-                           bool unconnected = true) const;
-
   /* Deterministic graph generators */
   static Graph AdjacencyMatrix(Matrix &adjmatrix,
                                AdjacencyMatrixMode mode = AdjacencyDirected);
-  // Skipped igraph_weighted_adjacency
-  // Skipped  igraph_adjlist
+  // Skipped igraph_weighted_adjacency (attributes has not been implemented)
+  // Skipped  igraph_adjlist (igraph_adjlist_t has not been implemented)
   static Graph Star(int vertices, StarMode mode = StarOut,
                     int center_vertex = 0);
-  static Graph Lattice(const Vector &dimension, int nei = 1,
+  static Graph Lattice(const VectorView &dimension, int nei = 1,
                        Directedness dir = Undirected,
                        Mutuality mutual = NotMutual,
                        Periodicity periodicity = NotPeriodic);
@@ -127,7 +120,7 @@ public:
                         Directedness dir = Directed,
                         BarabasiAlgorithm algo = BarabasiPSumTree,
                         const Graph &start_graph = Graph());
-  static Graph Barabasi(int vertices, double power, const Vector &outseq,
+  static Graph Barabasi(int vertices, double power, const VectorView &outseq,
                         bool outpref = false, double A = 1,
                         Directedness dir = Directed,
                         BarabasiAlgorithm algo = BarabasiPSumTree,
@@ -183,7 +176,7 @@ public:
                             bool outpref = false, double zero_appeal = 1.0,
                             Directedness dir = Undirected);
   static Graph RecentDegree(int vertices, double power, int window, int m,
-                            const Vector &outseq, bool outpref = false,
+                            const VectorView &outseq, bool outpref = false,
                             double zero_appeal = 1.0,
                             Directedness dir = Undirected);
   static Graph BarabasiAging(int vertices, int m, bool outpref, double pa_exp,
@@ -191,23 +184,82 @@ public:
                              double zero_deg_appeal, double zero_age_appeal,
                              double deg_coef, double age_coef,
                              Directedness dir = Undirected);
-  static Graph BarabasiAging(int vertices, const Vector &outseq, bool outpref,
-                             double pa_exp, double aging_exp, int aging_bin,
-                             double zero_deg_appeal, double zero_age_appeal,
-                             double deg_coef, double age_coef,
-                             Directedness dir = Undirected);
+  static Graph BarabasiAging(int vertices, const VectorView &outseq,
+                             bool outpref, double pa_exp, double aging_exp,
+                             int aging_bin, double zero_deg_appeal,
+                             double zero_age_appeal, double deg_coef,
+                             double age_coef, Directedness dir = Undirected);
   static Graph RecentDegreeAging(int vertices, int m, bool outpref,
                                  double pa_exp, double aging_exp, int aging_bin,
                                  double time_window, double zero_appeal,
                                  Directedness dir = Undirected);
-  static Graph RecentDegreeAging(int vertices, const Vector &outseq,
+  static Graph RecentDegreeAging(int vertices, const VectorView &outseq,
                                  bool outpref, double pa_exp, double aging_exp,
                                  int aging_bin, double time_window,
                                  double zero_appeal,
                                  Directedness dir = Undirected);
-  static Graph CitedType(int vertices, const Vector &types, const Vector &pref,
-                         int edges_per_step, Directedness dir = Undirected);
-  // Skipped igraph_sbm_game
+  static Graph CitedType(int vertices, const VectorView &types,
+                         const VectorView &pref, int edges_per_step,
+                         Directedness dir = Undirected);
+  // Skipped igraph_sbm_game (igraph_vector_int_t has not been implemented)
+
+  /* Graph, vertex, and edge attributes */
+
+  /* Structural properties of graphs */
+  /* Basic properties */
+  bool are_connected(int v1, int v2) const;
+
+  /* Shortest path related functions */
+  Matrix shortest_paths(const VertexSelector &from, const VertexSelector &to,
+                        NeighborMode mode = Out) const;
+  double shortest_paths(int from, int to, NeighborMode mode = Out) const;
+  Matrix shortest_paths_dijkstra(const VertexSelector &from,
+                                 const VertexSelector &to,
+                                 const VectorView &weights,
+                                 NeighborMode mode = Out) const;
+  double shortest_paths_dijkstra(int from, int to, const VectorView &weights,
+                                 NeighborMode mode = Out) const;
+  Matrix shortest_paths_bellman_ford(const VertexSelector &from,
+                                     const VertexSelector &to,
+                                     const VectorView &weights,
+                                     NeighborMode mode = Out) const;
+  double shortest_paths_bellman_ford(int from, int to,
+                                     const VectorView &weights,
+                                     NeighborMode mode = Out) const;
+  Matrix shortest_paths_johnson(const VertexSelector &from,
+                                const VertexSelector &to,
+                                const VectorView &weights) const;
+  double shortest_paths_johnson(int from, int to,
+                                const VectorView &weights) const;
+  // Skipped igraph_get_shortest_paths
+  // Skipped igraph_get_shortest_path
+  // Skipped igraph_get_shortest_paths_dijkstra
+  // Skipped igraph_get_shortest_path_dijkstra
+  // Skipped igraph_get_all_shortest_paths
+  // Skipped igraph_get_all_shortest_paths_dijkstra
+  double average_path_length(Directedness dir = Directed,
+                             bool unconnected = true) const;
+  Vector path_length_hist(Directedness dir = Directed,
+                          double *unconnected = NULL) const;
+  int diameter(int *source_vertex = NULL, int *target_vertex = NULL,
+               Directedness dir = Directed, bool unconnected = true) const;
+  int diameter(VectorView &path, Directedness dir = Directed,
+               bool unconnected = true) const;
+  double diameter_dijkstra(const VectorView &weights, int *source_vertex = NULL,
+                           int *target_vertex = NULL,
+                           Directedness dir = Directed,
+                           bool unconnected = true) const;
+  double diameter_dijkstra(const VectorView &weights, VectorView &path,
+                           Directedness dir = Directed,
+                           bool unconnected = true) const;
+  int girth() const;
+  int girth(Vector &circle) const;
+  Vector eccentricity(const VertexSelector &vids,
+                      NeighborMode mode = Out) const;
+  Vector eccentricity(int vertex, NeighborMode mode = Out) const;
+  double radius(NeighborMode mode = Out) const;
+
+  bool is_connected(Connectedness mode = WeaklyConnected) const;
 
   igraph_t *ptr() { return &graph_; }
   const igraph_t *ptr() const { return &graph_; }

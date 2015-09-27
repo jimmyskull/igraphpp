@@ -64,16 +64,13 @@ inline VertexSelector VertexSelector::None() {
   return instance;
 }
 inline VertexSelector VertexSelector::Single(int vid) {
-  static VertexSelector instance(igraph_vss_1(vid));
-  return instance;
+  return VertexSelector(igraph_vss_1(vid));
 }
 inline VertexSelector VertexSelector::FromVector(const VectorView &vector) {
-  static VertexSelector instance(igraph_vss_vector(vector.ptr()));
-  return instance;
+  return VertexSelector(igraph_vss_vector(vector.ptr()));
 }
 inline VertexSelector VertexSelector::Sequence(int from, int to) {
-  static VertexSelector instance(igraph_vss_seq(from, to));
-  return instance;
+  return VertexSelector(igraph_vss_seq(from, to));
 }
 template <typename... Args, typename>
 inline VertexSelector VertexSelector::Small(Args... args) {

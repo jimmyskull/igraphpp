@@ -11,6 +11,8 @@ namespace igraph {
 
 using Edge = std::pair<int, int>;
 
+static constexpr double kInfinity = IGRAPH_INFINITY;
+
 enum Directedness {
   Undirected = IGRAPH_UNDIRECTED,
   Directed = IGRAPH_DIRECTED

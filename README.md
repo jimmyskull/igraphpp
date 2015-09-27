@@ -110,7 +110,10 @@ exception mechanism to handle errors.
 * ~~`stochastic_imitation`~~
 
 ## Library functions
-* Structural properties — *Partial*
+
+### Structural properties
+* Basic properties
+* Shortest path related functions
 * ~~Neighborhood~~
 * ~~Graph components~~
 * ~~Degree sequences~~
