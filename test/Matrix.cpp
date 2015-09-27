@@ -54,4 +54,17 @@ TEST_CASE("Matrix", "[Matrix]") {
   mat = std::move(sq);
   Matrix a(std::move(mat2));
   Matrix b(std::move(b));
+
+  std::vector<double> v{{1, 2, 3, 4}};
+  Matrix init(v.begin(), v.end(), 2, 2);
+  CHECK(init.get_col(0) == Vector({1, 2}));
+  CHECK(init.get_col(1) == Vector({3, 4}));
+
+  init = Matrix(Vector({2, 1, 3, 4}), 2);
+  CHECK(init.get_col(0) == Vector({2, 1}));
+  CHECK(init.get_col(1) == Vector({3, 4}));
+
+  init = Matrix({5, 6, 7, 8}, 2);
+  CHECK(init.get_col(0) == Vector({5, 6}));
+  CHECK(init.get_col(1) == Vector({7, 8}));
 }

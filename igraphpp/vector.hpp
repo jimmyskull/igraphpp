@@ -89,6 +89,49 @@ public:
   const igraph_vector_t *ptr() const { return &vector_; }
   igraph_vector_t *ptr() { return &vector_; }
 
+  class iterator : public std::iterator<std::forward_iterator_tag, double> {
+  public:
+    iterator(igraph_vector_t *vec, long int pos) : vec_(vec), pos_(pos) {}
+    iterator(const iterator &itr) : vec_(itr.vec_), pos_(itr.pos_) {}
+    iterator &operator++() {
+      ++pos_;
+      return *this;
+    }
+    bool operator==(const iterator &rhs) const { return pos_ == rhs.pos_; }
+    bool operator!=(const iterator &rhs) const { return pos_ != rhs.pos_; }
+    double &operator*() { return VECTOR(*vec_)[pos_]; }
+
+  private:
+    igraph_vector_t *vec_;
+    long int pos_;
+  };
+
+  class const_iterator
+      : public std::iterator<std::forward_iterator_tag, double> {
+  public:
+    const_iterator(const igraph_vector_t *vec, long int pos)
+        : vec_(vec), pos_(pos) {}
+    const_iterator(const const_iterator &itr)
+        : vec_(itr.vec_), pos_(itr.pos_) {}
+    const_iterator &operator++() {
+      ++pos_;
+      return *this;
+    }
+    bool operator==(const const_iterator &rhs) { return pos_ == rhs.pos_; }
+    bool operator!=(const const_iterator &rhs) { return pos_ != rhs.pos_; }
+    double operator*() const { return VECTOR(*vec_)[pos_]; }
+
+  private:
+    const igraph_vector_t *vec_;
+    long int pos_;
+  };
+
+  iterator begin() { return iterator(ptr(), 0); }
+  iterator end() { return iterator(ptr(), size()); }
+
+  const_iterator cbegin() const { return const_iterator(ptr(), 0); }
+  const_iterator cend() const { return const_iterator(ptr(), size()); }
+
 protected:
   VectorView() = default;
 

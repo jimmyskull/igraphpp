@@ -90,15 +90,15 @@ exception mechanism to handle errors.
 * Graph::ForestFire — `igraph_forest_fire_game`
 * rewire  — `igraph_rewire`
 * GrowingRandom — `igraph_growing_random_game`
-* ~~CallawayTraits — `igraph_callaway_traits_game`~~
-* ~~Establishment — `igraph_establishment_game`~~
-* ~~Preference — `igraph_preference_game`~~
-* ~~AsymmetricPreference — `igraph_asymmetric_preference_game`~~
-* ~~RecentDegree — `igraph_recent_degree_game`~~
-* ~~BarabásiAging — `igraph_barabasi_aging_game`~~
-* ~~RecentDegreeAging — `igraph_recent_degree_aging_game`~~
-* ~~CitedType — `igraph_cited_type_game`~~
-* ~~CitingCitedType — `igraph_citing_cited_type`~~
+* CallawayTraits — `igraph_callaway_traits_game`
+* Establishment — `igraph_establishment_game`
+* Preference — `igraph_preference_game`
+* AsymmetricPreference — `igraph_asymmetric_preference_game`
+* RecentDegree — `igraph_recent_degree_game`
+* BarabásiAging — `igraph_barabasi_aging_game`
+* RecentDegreeAging — `igraph_recent_degree_aging_game`
+* CitedType — `igraph_cited_type_game`
+* CitingCitedType — `igraph_citing_cited_type`
 * ~~StochasticBlockModel — `igraph_sbm_game`~~
 
 ## Games on graphs

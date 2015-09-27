@@ -156,13 +156,9 @@ TEST_CASE("VectorView", "[VectorView]") {
   CHECK(max == 4);
   CHECK(wmax == N - 1);
 
-  // Vector intersect = va.intersect_sorted(vb);
-  // CHECK(intersect.size() == 2);
-  // CHECK(intersect[0] == 1);
-  // CHECK(intersect[1] == 2);
+  std::vector<double> vvb{vb.begin(), vb.end()};
+  CHECK(Vector(vvb.begin(), vvb.end()) == Vector({10, 9, 6, 2, 1}));
 
-  // Vector difference = va.difference_sorted(vb);
-  // CHECK(difference.size() == 2);
-  // CHECK(difference[0] == 3);
-  // CHECK(difference[1] == 4);
+  std::vector<double> cvvb{vb.cbegin(), vb.cend()};
+  CHECK(Vector(cvvb.begin(), cvvb.end()) == Vector({10, 9, 6, 2, 1}));
 }

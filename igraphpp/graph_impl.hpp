@@ -373,19 +373,21 @@ inline Graph Graph::kRegular(int vertices, int k, Directedness dir,
   SafeCall(igraph_k_regular_game(&graph, vertices, k, dir, multiple));
   return Graph(graph);
 }
-inline Graph Graph::StaticFitness(int vertices, VectorView &fitness,
+inline Graph Graph::StaticFitness(int vertices, const VectorView &fitness,
                                   Loops loops, bool multiple) {
   igraph_t graph;
-  SafeCall(igraph_static_fitness_game(&graph, vertices, fitness.ptr(), NULL,
-                                      loops, multiple));
+  SafeCall(igraph_static_fitness_game(
+      &graph, vertices, const_cast<igraph_vector_t *>(fitness.ptr()), NULL,
+      loops, multiple));
   return Graph(graph);
 }
-inline Graph Graph::StaticFitness(int vertices, VectorView &fitness_out,
-                                  VectorView &fitness_in, Loops loops,
+inline Graph Graph::StaticFitness(int vertices, const VectorView &fitness_out,
+                                  const VectorView &fitness_in, Loops loops,
                                   bool multiple) {
   igraph_t graph;
-  SafeCall(igraph_static_fitness_game(&graph, vertices, fitness_out.ptr(),
-                                      fitness_in.ptr(), loops, multiple));
+  SafeCall(igraph_static_fitness_game(
+      &graph, vertices, const_cast<igraph_vector_t *>(fitness_out.ptr()),
+      const_cast<igraph_vector_t *>(fitness_in.ptr()), loops, multiple));
   return Graph(graph);
 }
 inline Graph Graph::StaticPowerLaw(int vertices, int edges, double exponent_out,
@@ -409,9 +411,119 @@ inline void Graph::rewire(int trials, RewiringMode mode) {
   SafeCall(igraph_rewire(ptr(), trials, static_cast<igraph_rewiring_t>(mode)));
 }
 inline Graph Graph::GrowingRandom(int vertices, int m, Directedness dir,
-                           bool citation) {
+                                  bool citation) {
   igraph_t graph;
   SafeCall(igraph_growing_random_game(&graph, vertices, m, dir, citation));
+  return Graph(graph);
+}
+inline Graph Graph::CallawayTraits(int vertices, int types, int edges_per_step,
+                                   const VectorView &type_dist,
+                                   const Matrix &pref_matrix,
+                                   Directedness dir) {
+  igraph_t graph;
+  SafeCall(igraph_callaway_traits_game(
+      &graph, vertices, types, edges_per_step,
+      const_cast<igraph_vector_t *>(type_dist.ptr()),
+      const_cast<igraph_matrix_t *>(pref_matrix.ptr()), dir));
+  return Graph(graph);
+}
+inline Graph Graph::Establishment(int vertices, int types, int trials_per_step,
+                                  const VectorView &type_dist,
+                                  const Matrix &pref_matrix, Directedness dir) {
+  igraph_t graph;
+  SafeCall(igraph_establishment_game(
+      &graph, vertices, types, trials_per_step,
+      const_cast<igraph_vector_t *>(type_dist.ptr()),
+      const_cast<igraph_matrix_t *>(pref_matrix.ptr()), dir));
+  return Graph(graph);
+}
+inline Graph Graph::Preference(int vertices, int types,
+                               const VectorView &type_dist, bool fixed_sizes,
+                               const Matrix &pref_matrix, Directedness dir,
+                               Loops loops) {
+  igraph_t graph;
+  SafeCall(igraph_preference_game(
+      &graph, vertices, types, const_cast<igraph_vector_t *>(type_dist.ptr()),
+      fixed_sizes, const_cast<igraph_matrix_t *>(pref_matrix.ptr()), NULL, dir,
+      loops));
+  return Graph(graph);
+}
+inline Graph Graph::AsymmetricPreference(int vertices, int types,
+                                         const Matrix &type_dist_matrix,
+                                         const Matrix &pref_matrix,
+                                         Loops loops) {
+  igraph_t graph;
+  SafeCall(igraph_asymmetric_preference_game(
+      &graph, vertices, types,
+      const_cast<igraph_matrix_t *>(type_dist_matrix.ptr()),
+      const_cast<igraph_matrix_t *>(pref_matrix.ptr()), NULL, NULL, loops));
+  return Graph(graph);
+}
+inline Graph Graph::RecentDegree(int vertices, double power, int window,
+                                 bool outpref, double zero_appeal,
+                                 Directedness dir) {
+  igraph_t graph;
+  SafeCall(igraph_recent_degree_game(&graph, vertices, power, window, 0, NULL,
+                                     outpref, zero_appeal, dir));
+  return Graph(graph);
+}
+inline Graph Graph::RecentDegree(int vertices, double power, int window, int m,
+                                 const Vector &outseq, bool outpref,
+                                 double zero_appeal, Directedness dir) {
+  igraph_t graph;
+  SafeCall(igraph_recent_degree_game(&graph, vertices, power, window, m,
+                                     outseq.ptr(), outpref, zero_appeal, dir));
+  return Graph(graph);
+}
+inline Graph Graph::BarabasiAging(int vertices, int m, bool outpref,
+                                  double pa_exp, double aging_exp,
+                                  int aging_bin, double zero_deg_appeal,
+                                  double zero_age_appeal, double deg_coef,
+                                  double age_coef, Directedness dir) {
+  igraph_t graph;
+  SafeCall(igraph_barabasi_aging_game(
+      &graph, vertices, m, NULL, outpref, pa_exp, aging_exp, aging_bin,
+      zero_deg_appeal, zero_age_appeal, deg_coef, age_coef, dir));
+  return Graph(graph);
+}
+inline Graph Graph::BarabasiAging(int vertices, const Vector &outseq,
+                                  bool outpref, double pa_exp, double aging_exp,
+                                  int aging_bin, double zero_deg_appeal,
+                                  double zero_age_appeal, double deg_coef,
+                                  double age_coef, Directedness dir) {
+  igraph_t graph;
+  SafeCall(igraph_barabasi_aging_game(
+      &graph, vertices, 0, outseq.ptr(), outpref, pa_exp, aging_exp, aging_bin,
+      zero_deg_appeal, zero_age_appeal, deg_coef, age_coef, dir));
+  return Graph(graph);
+}
+inline Graph Graph::RecentDegreeAging(int vertices, int m, bool outpref,
+                                      double pa_exp, double aging_exp,
+                                      int aging_bin, double time_window,
+                                      double zero_appeal, Directedness dir) {
+  igraph_t graph;
+  SafeCall(igraph_recent_degree_aging_game(&graph, vertices, m, NULL, outpref,
+                                           pa_exp, aging_exp, aging_bin,
+                                           time_window, zero_appeal, dir));
+  return Graph(graph);
+}
+inline Graph Graph::RecentDegreeAging(int vertices, const Vector &outseq,
+                                      bool outpref, double pa_exp,
+                                      double aging_exp, int aging_bin,
+                                      double time_window, double zero_appeal,
+                                      Directedness dir) {
+  igraph_t graph;
+  SafeCall(igraph_recent_degree_aging_game(
+      &graph, vertices, 0, outseq.ptr(), outpref, pa_exp, aging_exp, aging_bin,
+      time_window, zero_appeal, dir));
+  return Graph(graph);
+}
+inline Graph Graph::CitedType(int vertices, const Vector &types,
+                              const Vector &pref, int edges_per_step,
+                              Directedness dir) {
+  igraph_t graph;
+  SafeCall(igraph_cited_type_game(&graph, vertices, types.ptr(), pref.ptr(),
+                                  edges_per_step, dir));
   return Graph(graph);
 }
 

@@ -5,7 +5,11 @@
 #error "You must include igraph.hpp first"
 #endif
 
+#include <initializer_list>
+
 #include <igraph.h>
+
+#include "./util.hpp"
 
 namespace igraph {
 
@@ -16,6 +20,11 @@ public:
   /* Constructors and destructors */
   ~Matrix();
   Matrix(long int nrow = 0, long int ncol = 0);
+  Matrix(std::initializer_list<double> elements, long int nrow);
+  Matrix(const VectorView &elements, long int nrow);
+  template <typename Iterator, typename = typename std::enable_if<
+                                   util::is_iterator<Iterator>::value>::type>
+  Matrix(Iterator begin, Iterator end, long int nrow, long int ncol);
   Matrix(const Matrix &matrix);
   Matrix(Matrix &&matrix);
   Matrix &operator=(const Matrix &matrix);
@@ -32,6 +41,7 @@ public:
 
   /* Accessing elements */
   double &operator()(long int i, long int j) noexcept;
+  double &at(long int i, long int j) noexcept;
 
   /* Operations on rows and columns */
   Vector get_row(long int index) const;

@@ -201,12 +201,18 @@ TEST_CASE("Graph — deterministic generators", "[Graph]") {
   CHECK(gnei.ecount() == 3);
   gnei.connect_neighborhood(2);
   CHECK(gnei.ecount() == 5);
+}
 
-  // Graph grg = Graph::GRG(10, std::sqrt(2.0) / 2.0, true);
-  // CHECK(grg.vcount() == 10);
-  // CHECK(grg.ecount() == 10 * 9 / 2);
+TEST_CASE("Graph — randomized graph generators", "[Graph]") {
+  using igraph::Matrix;
+  using igraph::Graph;
+  using igraph::Vector;
 
-  // Graph barabasi = Graph::Barabasi(100);
+  Graph grg = Graph::GRG(10, std::sqrt(2.0) / 2.0, true);
+  CHECK(grg.vcount() == 10);
+  CHECK(grg.ecount() == 10 * 9 / 2);
+
+  Graph barabasi = Graph::Barabasi(100);
 
   Graph er = Graph::ErdosRenyi(100, 0.1);
   CHECK(er.vcount() == 100);
@@ -226,6 +232,21 @@ TEST_CASE("Graph — deterministic generators", "[Graph]") {
 
   Graph spl = Graph::StaticPowerLaw(10, 20, 2.0);
 
-  Graph ff = Graph::ForestFire(10000, 0.37, 0.32 / 0.37);
+  Graph ff = Graph::ForestFire(200, 0.37, 0.32 / 0.37);
   ff.rewire(100);
+
+  Graph ct =
+      Graph::CallawayTraits(200, 2, 1, Vector({1, 1}), Matrix({1, 0, 0, 1}, 2));
+  Graph st =
+      Graph::Establishment(200, 2, 2, Vector({1, 1}), Matrix({1, 0, 0, 1}, 2));
+
+  Graph pref =
+      Graph::Preference(20, 2, Vector({1, 1}), false, Matrix({1, 0, 0, 1}, 2));
+  Graph apref = Graph::AsymmetricPreference(20, 2, Matrix({1, 1, 1, 1}, 2),
+                                            Matrix({0, 1, 0, 0}, 2));
+
+  // RecentDegree
+  // BarabasiAging
+  // RecentDegreeAging
+  // CitedType
 }

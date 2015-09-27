@@ -19,6 +19,24 @@ inline Matrix::~Matrix() {
 inline Matrix::Matrix(long int nrow, long int ncol) {
   SafeCall(igraph_matrix_init(ptr(), nrow, ncol));
 }
+inline Matrix::Matrix(std::initializer_list<double> elements, long int nrow)
+    : Matrix(elements.begin(), elements.end(), nrow, elements.size() / nrow) {}
+template <typename Iterator, typename>
+Matrix::Matrix(Iterator begin, Iterator end, long int nrow, long int ncol)
+    : Matrix(nrow, ncol) {
+  long int i = 0, j = 0;
+  for (; begin != end; ++begin) {
+    this->at(i, j) = *begin;
+    ++i;
+    if (i == nrow) {
+      i = 0;
+      ++j;
+    }
+  }
+}
+inline Matrix::Matrix(const VectorView &elements, long int nrow)
+    : Matrix(elements.cbegin(), elements.cend(), nrow, elements.size() / nrow) {
+}
 inline Matrix::Matrix(const Matrix &matrix) {
   SafeCall(igraph_matrix_copy(ptr(), matrix.ptr()));
 }
@@ -57,6 +75,9 @@ inline void Matrix::swap(Matrix &m2) {
 
 /* Accessing elements */
 inline double &Matrix::operator()(long int i, long int j) noexcept {
+  return MATRIX(*ptr(), i, j);
+}
+inline double &Matrix::at(long int i, long int j) noexcept {
   return MATRIX(*ptr(), i, j);
 }
 

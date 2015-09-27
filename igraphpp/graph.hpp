@@ -148,11 +148,11 @@ public:
                  DegreeSequenceMethod method = DegreeSequenceSimple);
   static Graph kRegular(int vertices, int k, Directedness dir = Directed,
                         bool multiple = false);
-  static Graph StaticFitness(int vertices, VectorView &fitness,
+  static Graph StaticFitness(int vertices, const VectorView &fitness,
                              Loops loops = NoLoops, bool multiple = false);
-  static Graph StaticFitness(int vertices, VectorView &fitness_out,
-                             VectorView &fitness_in, Loops loops = NoLoops,
-                             bool multiple = false);
+  static Graph StaticFitness(int vertices, const VectorView &fitness_out,
+                             const VectorView &fitness_in,
+                             Loops loops = NoLoops, bool multiple = false);
   static Graph StaticPowerLaw(int vertices, int edges, double exponent_out,
                               double exponent_in = -1.0, Loops loops = NoLoops,
                               bool multiple = false,
@@ -164,6 +164,50 @@ public:
   static Graph GrowingRandom(int vertices, int m = 1,
                              Directedness dir = Directed,
                              bool citation = false);
+  static Graph CallawayTraits(int vertices, int types, int edges_per_step,
+                              const VectorView &type_dist,
+                              const Matrix &pref_matrix,
+                              Directedness dir = Undirected);
+  static Graph Establishment(int vertices, int types, int trials_per_step,
+                             const VectorView &type_dist,
+                             const Matrix &pref_matrix,
+                             Directedness dir = Undirected);
+  static Graph Preference(int vertices, int types, const VectorView &type_dist,
+                          bool fixed_sizes, const Matrix &pref_matrix,
+                          Directedness dir = Undirected, Loops loops = NoLoops);
+  static Graph AsymmetricPreference(int vertices, int types,
+                                    const Matrix &type_dist_matrix,
+                                    const Matrix &pref_matrix,
+                                    Loops loops = NoLoops);
+  static Graph RecentDegree(int vertices, double power, int window,
+                            bool outpref = false, double zero_appeal = 1.0,
+                            Directedness dir = Undirected);
+  static Graph RecentDegree(int vertices, double power, int window, int m,
+                            const Vector &outseq, bool outpref = false,
+                            double zero_appeal = 1.0,
+                            Directedness dir = Undirected);
+  static Graph BarabasiAging(int vertices, int m, bool outpref, double pa_exp,
+                             double aging_exp, int aging_bin,
+                             double zero_deg_appeal, double zero_age_appeal,
+                             double deg_coef, double age_coef,
+                             Directedness dir = Undirected);
+  static Graph BarabasiAging(int vertices, const Vector &outseq, bool outpref,
+                             double pa_exp, double aging_exp, int aging_bin,
+                             double zero_deg_appeal, double zero_age_appeal,
+                             double deg_coef, double age_coef,
+                             Directedness dir = Undirected);
+  static Graph RecentDegreeAging(int vertices, int m, bool outpref,
+                                 double pa_exp, double aging_exp, int aging_bin,
+                                 double time_window, double zero_appeal,
+                                 Directedness dir = Undirected);
+  static Graph RecentDegreeAging(int vertices, const Vector &outseq,
+                                 bool outpref, double pa_exp, double aging_exp,
+                                 int aging_bin, double time_window,
+                                 double zero_appeal,
+                                 Directedness dir = Undirected);
+  static Graph CitedType(int vertices, const Vector &types, const Vector &pref,
+                         int edges_per_step, Directedness dir = Undirected);
+  // Skipped igraph_sbm_game
 
   igraph_t *ptr() { return &graph_; }
   const igraph_t *ptr() const { return &graph_; }
