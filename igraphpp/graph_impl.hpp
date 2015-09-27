@@ -56,6 +56,8 @@ inline Graph &Graph::operator=(const Graph &other) {
   return *this;
 }
 inline Graph &Graph::operator=(Graph &&other) {
+  if (owner())
+    SafeCall(igraph_destroy(&graph_));
   *ptr() = *other.ptr();
   other.disown();
   return *this;
@@ -145,7 +147,7 @@ inline bool Graph::is_directed() const noexcept {
 inline Vector Graph::degree(const VertexSelector &vids, NeighborMode mode,
                             Loops loops) const {
   Vector degrees;
-  SafeCall(igraph_degree(ptr(), degrees.ptr(), *vids.ptr(),
+  SafeCall(igraph_degree(ptr(), degrees.ptr(), vids.vs(),
                          static_cast<igraph_neimode_t>(mode), loops));
   return degrees;
 }
@@ -158,12 +160,35 @@ inline Vector Graph::degree(std::initializer_list<double> vids,
   return degrees;
 }
 
-inline bool Graph::is_connected(Connectedness mode) const {
-  igraph_bool_t connected;
-  igraph_connectedness_t m = static_cast<igraph_connectedness_t>(mode);
-  int ret = igraph_is_connected(&graph_, &connected, m);
-  SafeCall(ret);
-  return static_cast<bool>(connected);
+inline Graph &Graph::add_edge(int from, int to) {
+  SafeCall(igraph_add_edge(&graph_, from, to));
+  return *this;
+}
+inline Graph &Graph::add_edges(const Vector &edges) {
+  SafeCall(igraph_add_edges(&graph_, edges.ptr(), NULL));
+  return *this;
+}
+inline Graph &Graph::add_edges(std::initializer_list<double> edges) {
+  Vector vector(edges);
+  return add_edges(vector);
+}
+inline Graph &Graph::add_vertices(int number_of_vertices) {
+  SafeCall(igraph_add_vertices(ptr(), number_of_vertices, NULL));
+  return *this;
+}
+inline void Graph::delete_edges(const EdgeSelector &edges) {
+  SafeCall(igraph_delete_edges(ptr(), edges.es()));
+}
+inline void Graph::delete_edges(std::initializer_list<double> edges) {
+  EdgeSelector sel(edges);
+  SafeCall(igraph_delete_edges(ptr(), sel.es()));
+}
+inline void Graph::delete_vertices(const VertexSelector &vertices) {
+  SafeCall(igraph_delete_vertices(ptr(), vertices.vs()));
+}
+inline void Graph::delete_vertices(std::initializer_list<double> vertices) {
+  VertexSelector sel(vertices);
+  SafeCall(igraph_delete_vertices(ptr(), sel.vs()));
 }
 
 inline int Graph::diameter(Directedness directed, bool unconnected) const {
@@ -174,22 +199,12 @@ inline int Graph::diameter(Directedness directed, bool unconnected) const {
   return length;
 }
 
-// inline Vector Graph::degrees(NeighborMode mode, Loops loops) const {
-//   Vector v;
-//   bool lps = (loops == AllowLoops);
-//   SafeCall(igraph_degree(&graph_, v.ptr(), igraph_vss_all(),
-//                          static_cast<igraph_neimode_t>(mode), lps));
-//   return std::move(v);
-// }
-
-inline Graph &Graph::AddEdge(int from, int to) {
-  SafeCall(igraph_add_edge(&graph_, from, to));
-  return *this;
-}
-
-inline Graph &Graph::AddEdges(const Vector &edges) {
-  SafeCall(igraph_add_edges(&graph_, edges.ptr(), NULL));
-  return *this;
+inline bool Graph::is_connected(Connectedness mode) const {
+  igraph_bool_t connected;
+  igraph_connectedness_t m = static_cast<igraph_connectedness_t>(mode);
+  int ret = igraph_is_connected(&graph_, &connected, m);
+  SafeCall(ret);
+  return static_cast<bool>(connected);
 }
 
 inline double Graph::AveragePathLength(Directedness directed,
@@ -199,13 +214,92 @@ inline double Graph::AveragePathLength(Directedness directed,
   return ret;
 }
 
+inline Graph Graph::AdjacencyMatrix(Matrix &adjmatrix,
+                                    AdjacencyMatrixMode mode) {
+  igraph_t graph;
+  SafeCall(igraph_adjacency(&graph, adjmatrix.ptr(),
+                            static_cast<igraph_adjacency_t>(mode)));
+  return Graph(graph);
+}
+inline Graph Graph::Star(int vertices, StarMode mode, int center_vertex) {
+  igraph_t graph;
+  SafeCall(igraph_star(&graph, vertices, static_cast<igraph_star_mode_t>(mode),
+                       center_vertex));
+  return Graph(graph);
+}
 inline Graph Graph::Lattice(const Vector &dimension, int nei, Directedness dir,
                             Mutuality mutual, Periodicity periodicity) {
   igraph_t graph;
-  int ret =
-      igraph_lattice(&graph, dimension.ptr(), nei, dir, mutual, periodicity);
-  SafeCall(ret);
+  SafeCall(
+      igraph_lattice(&graph, dimension.ptr(), nei, dir, mutual, periodicity));
   return Graph(graph);
+}
+inline Graph Graph::Ring(int vertices, Directedness dir, Mutuality mutual,
+                         bool circular) {
+  igraph_t graph;
+  SafeCall(igraph_ring(&graph, vertices, dir, mutual, circular));
+  return Graph(graph);
+}
+inline Graph Graph::Tree(int vertices, int children, TreeMode mode) {
+  igraph_t graph;
+  SafeCall(igraph_tree(&graph, vertices, children,
+                       static_cast<igraph_tree_mode_t>(mode)));
+  return Graph(graph);
+}
+inline Graph Graph::Full(int vertices, Directedness dir, Loops loops) {
+  igraph_t graph;
+  SafeCall(igraph_full(&graph, vertices, dir, loops));
+  return Graph(graph);
+}
+inline Graph Graph::FullCitation(int vertices, Directedness dir) {
+  igraph_t graph;
+  SafeCall(igraph_full_citation(&graph, vertices, dir));
+  return Graph(graph);
+}
+inline Graph Graph::Famous(const char *name) {
+  igraph_t graph;
+  SafeCall(igraph_famous(&graph, name));
+  return Graph(graph);
+}
+template <typename... Args, typename>
+Graph Graph::LCF(int vertices, Args... args) {
+  igraph_t graph;
+  SafeCall(igraph_lcf(&graph, vertices, args..., 0));
+  return Graph(graph);
+}
+inline Graph Graph::LCF(int vertices, const VectorView &shifts, int repeats) {
+  igraph_t graph;
+  SafeCall(igraph_lcf_vector(&graph, vertices, shifts.ptr(), repeats));
+  return Graph(graph);
+}
+inline Graph Graph::LCF(int vertices, std::initializer_list<double> shifts,
+                        int repeats) {
+  Vector vshifts(shifts);
+  return LCF(vertices, vshifts, repeats);
+}
+inline Graph Graph::Atlas(int number) {
+  igraph_t graph;
+  SafeCall(igraph_atlas(&graph, number));
+  return Graph(graph);
+}
+inline Graph Graph::deBruijn(int m, int n) {
+  igraph_t graph;
+  SafeCall(igraph_de_bruijn(&graph, m, n));
+  return Graph(graph);
+}
+inline Graph Graph::Kautz(int m, int n) {
+  igraph_t graph;
+  SafeCall(igraph_kautz(&graph, m, n));
+  return Graph(graph);
+}
+inline Graph Graph::ExtendedChordalRing(int vertices, const Matrix &W) {
+  igraph_t graph;
+  SafeCall(igraph_extended_chordal_ring(&graph, vertices, W.ptr()));
+  return Graph(graph);
+}
+inline void Graph::connect_neighborhood(int order, NeighborMode mode) {
+  SafeCall(igraph_connect_neighborhood(ptr(), order,
+                                       static_cast<igraph_neimode_t>(mode)));
 }
 
 inline Graph Graph::ErdosRenyiGame(int vertices, double prob, Directedness dir,
@@ -226,9 +320,7 @@ inline Graph Graph::ErdosRenyiGame(int vertices, int edges, Directedness dir,
   return Graph(graph);
 }
 
-inline Graph::Graph(const igraph_t &graph) {
-  SafeCall(igraph_copy(&graph_, &graph));
-}
+inline Graph::Graph(const igraph_t &graph) : graph_(graph) {}
 
 } // namespace igraph
 

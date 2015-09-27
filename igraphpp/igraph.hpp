@@ -37,6 +37,29 @@ enum EdgeOrder {
   EdgeByTargetId = IGRAPH_EDGEORDER_TO
 };
 
+enum AdjacencyMatrixMode {
+  AdjacencyDirected = IGRAPH_ADJ_DIRECTED,
+  AdjacencyUndirected = IGRAPH_ADJ_UNDIRECTED,
+  AdjacencyMax = IGRAPH_ADJ_MAX,
+  AdjacencyMin = IGRAPH_ADJ_MIN,
+  AdjacencyPlus = IGRAPH_ADJ_PLUS,
+  AdjacencyUpper = IGRAPH_ADJ_UPPER,
+  AdjacencyLower = IGRAPH_ADJ_LOWER
+};
+
+enum StarMode {
+  StarOut = IGRAPH_STAR_OUT,
+  StarIn = IGRAPH_STAR_IN,
+  StarMutual = IGRAPH_STAR_MUTUAL,
+  StarUndirected = IGRAPH_STAR_UNDIRECTED,
+};
+
+enum TreeMode {
+  TreeOut = IGRAPH_TREE_OUT,
+  TreeIn = IGRAPH_TREE_IN,
+  TreeUndirected = IGRAPH_TREE_UNDIRECTED
+};
+
 static inline int SetSeed(unsigned long int seed) {
   igraph_rng_t *rng = igraph_rng_default();
   int ret = igraph_rng_seed(rng, seed);

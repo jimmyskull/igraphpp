@@ -11,7 +11,7 @@ TEST_CASE("EdgeSelector", "[EdgeSelector]") {
   using igraph::Graph;
 
   Graph g(10);
-  g.AddEdge(0, 1).AddEdge(0, 2).AddEdge(2, 3);
+  g.add_edge(0, 1).add_edge(0, 2).add_edge(2, 3);
 
   EdgeSelector vall = EdgeSelector::All();
   CHECK(vall.size(g) == 3);

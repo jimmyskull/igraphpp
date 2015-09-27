@@ -60,22 +60,22 @@ exception mechanism to handle errors.
 ### Deterministic graph generators
 * Create — `igraph_create`
 * Small — `igraph_small`
-* ~~Adjacency matrix — `igraph_adacency`~~
+* Adjacency matrix — `igraph_adacency`
 * ~~Weighted adjacency matrix — `igraph_weighted_adjacency`~~
 * ~~Adjacency list — `igraph_adjlist`~~
-* ~~Star — `igraph_star`~~
+* Star — `igraph_star`
 * Lattice — `igraph_lattice`
-* ~~Ring — `igraph_ring`~~
-* ~~Tree — `igraph_tree`~~
-* ~~Full — `igraph_full`~~
-* ~~Full citation — `igraph_full_citation`~~
-* ~~Famous — `igraph_famous`~~
-* ~~LCF — `igraph_lcf` & `igraph_lcf_vector`~~
-* ~~Atlas — `igraph_atlas`~~
-* ~~de Bruijn — `igraph_de_bruijn`~~
-* ~~Kautz — `igraph_kautz`~~
-* ~~Extended chordal ring — `igraph_extended_chordal_ring`~~
-* ~~Connect neighborhood — `igraph_connect_neighborhood`~~
+* Ring — `igraph_ring`
+* Tree — `igraph_tree`
+* Full — `igraph_full`
+* Full citation — `igraph_full_citation`
+* Famous — `igraph_famous`
+* LCF — `igraph_lcf` & `igraph_lcf_vector`
+* Atlas — `igraph_atlas`
+* de Bruijn — `igraph_de_bruijn`
+* Kautz — `igraph_kautz`
+* Extended chordal ring — `igraph_extended_chordal_ring`
+* Connect neighborhood — `igraph_connect_neighborhood`
 
 ### Randomized graph generators
 * ~~Geometric random  — `igraph_grg_game`~~

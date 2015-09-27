@@ -12,7 +12,7 @@ TEST_CASE("VertexSelector", "[VertexSelector]") {
   using igraph::Graph;
 
   Graph g(10);
-  g.AddEdge(0, 1);
+  g.add_edge(0, 1);
 
   VertexSelector vall = VertexSelector::All();
   CHECK(vall.size(g) == 10);

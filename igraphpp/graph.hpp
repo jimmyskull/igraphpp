@@ -74,8 +74,14 @@ public:
                 Loops loops = NoLoops) const;
 
   /* Adding and deleting vertices and edges */
-  Graph &AddEdge(int from, int to);
-  Graph &AddEdges(const Vector &edges);
+  Graph &add_edge(int from, int to);
+  Graph &add_edges(const Vector &edges);
+  Graph &add_edges(std::initializer_list<double> edges);
+  Graph &add_vertices(int number_of_vertices);
+  void delete_edges(const EdgeSelector &edges);
+  void delete_edges(std::initializer_list<double> edges);
+  void delete_vertices(const VertexSelector &vertices);
+  void delete_vertices(std::initializer_list<double> vertices);
 
   bool is_connected(Connectedness mode = WeaklyConnected) const;
 
@@ -84,16 +90,39 @@ public:
   double AveragePathLength(Directedness directed = Directed,
                            bool unconnected = true) const;
 
-  static Graph Empty(int vertices = 0, Directedness dir = Undirected);
+  /* Deterministic graph generators */
+  static Graph AdjacencyMatrix(Matrix &adjmatrix,
+                               AdjacencyMatrixMode mode = AdjacencyDirected);
+  // Skipped igraph_weighted_adjacency
+  // Skipped  igraph_adjlist
+  static Graph Star(int vertices, StarMode mode = StarOut,
+                    int center_vertex = 0);
   static Graph Lattice(const Vector &dimension, int nei = 1,
                        Directedness dir = Undirected,
                        Mutuality mutual = NotMutual,
                        Periodicity periodicity = NotPeriodic);
+  static Graph Ring(int vertices, Directedness dir = Undirected,
+                    Mutuality mutual = NotMutual, bool circular = true);
+  static Graph Tree(int vertices, int children = 2, TreeMode mode = TreeOut);
+  static Graph Full(int vertices, Directedness dir = Undirected,
+                    Loops loops = NoLoops);
+  static Graph FullCitation(int vertices, Directedness dir = Directed);
+  static Graph Famous(const char *name);
+  template <typename... Args, typename = std::enable_if_t<util::all_args(
+                                  std::is_same<Args, int>::value...)>>
+  static Graph LCF(int vertices, Args... args);
+  static Graph LCF(int vertices, const VectorView &shifts, int repeats);
+  static Graph LCF(int vertices, std::initializer_list<double> shifts,
+                   int repeats);
+  static Graph Atlas(int number);
+  static Graph deBruijn(int m, int n);
+  static Graph Kautz(int m, int n);
+  static Graph ExtendedChordalRing(int vertices, const Matrix &W);
+  void connect_neighborhood(int order, NeighborMode mode = Out);
 
   static Graph ErdosRenyiGame(int vertices, double prob,
                               Directedness dir = Undirected,
                               Loops loops = NoLoops);
-
   static Graph ErdosRenyiGame(int vertices, int edges,
                               Directedness dir = Undirected,
                               Loops loops = NoLoops);

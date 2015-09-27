@@ -71,10 +71,10 @@ inline Vector Matrix::get_col(long int index) const {
   SafeCall(igraph_matrix_get_col(ptr(), vector.ptr(), index));
   return vector;
 }
-inline void Matrix::set_row(const Vector &vector, long int index) {
+inline void Matrix::set_row(long int index, const Vector &vector) {
   SafeCall(igraph_matrix_set_row(ptr(), vector.ptr(), index));
 }
-inline void Matrix::set_col(const Vector &vector, long int index) {
+inline void Matrix::set_col(long int index, const Vector &vector) {
   SafeCall(igraph_matrix_set_col(ptr(), vector.ptr(), index));
 }
 inline void Matrix::swap_rows(long int i, long j) {

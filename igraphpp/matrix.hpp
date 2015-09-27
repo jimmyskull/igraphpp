@@ -36,8 +36,8 @@ public:
   /* Operations on rows and columns */
   Vector get_row(long int index) const;
   Vector get_col(long int index) const;
-  void set_row(const Vector &vector, long int index);
-  void set_col(const Vector &vector, long int index);
+  void set_row(long int index, const Vector &vector);
+  void set_col(long int index, const Vector &vector);
   void swap_rows(long int i, long j);
   void swap_cols(long int i, long j);
   Matrix select_rows(const Vector &rows);
