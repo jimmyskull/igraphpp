@@ -58,48 +58,48 @@ exception mechanism to handle errors.
 ## Graph generators
 
 ### Deterministic graph generators
-* Create — `igraph_create`
-* Small — `igraph_small`
-* Adjacency matrix — `igraph_adacency`
+* Graph() — `igraph_create`
+* Graph({}) — `igraph_small`
+* Graph::AdjacencyMatrix — `igraph_adacency`
 * ~~Weighted adjacency matrix — `igraph_weighted_adjacency`~~
 * ~~Adjacency list — `igraph_adjlist`~~
-* Star — `igraph_star`
-* Lattice — `igraph_lattice`
-* Ring — `igraph_ring`
-* Tree — `igraph_tree`
-* Full — `igraph_full`
-* Full citation — `igraph_full_citation`
-* Famous — `igraph_famous`
-* LCF — `igraph_lcf` & `igraph_lcf_vector`
-* Atlas — `igraph_atlas`
-* de Bruijn — `igraph_de_bruijn`
-* Kautz — `igraph_kautz`
-* Extended chordal ring — `igraph_extended_chordal_ring`
-* Connect neighborhood — `igraph_connect_neighborhood`
+* Graph::Star — `igraph_star`
+* Graph::Lattice — `igraph_lattice`
+* Graph::Ring — `igraph_ring`
+* Graph::Tree — `igraph_tree`
+* Graph::Full — `igraph_full`
+* Graph::FullCitation — `igraph_full_citation`
+* Graph::Famous — `igraph_famous`
+* Graph::LCF — `igraph_lcf` & `igraph_lcf_vector`
+* Graph::Atlas — `igraph_atlas`
+* Graph::deBruijn — `igraph_de_bruijn`
+* Graph::Kautz — `igraph_kautz`
+* Graph::ExtendedChordalRing — `igraph_extended_chordal_ring`
+* Graph::ConnectNeighborhood — `igraph_connect_neighborhood`
 
 ### Randomized graph generators
-* ~~Geometric random  — `igraph_grg_game`~~
-* ~~Barabási–Albert — `igraph_barabasi_game`~~
-* Erdős–Rényi — `igraph_erdos_renyi_game`
-* ~~Watts–Strogatz — `igraph_watts_strogatz_game`~~
-* ~~Rewire edges — `igraph_rewire_edges`~~
-* ~~Degree sequence — `igraph_degree_sequence_game`~~
-* ~~k-regular  — `igraph_k_regular_game`~~
-* ~~Static fitness — `igraph_static_fitness_game`~~
-* ~~Static power-law — `igraph_static_power_law_game`~~
-* ~~Forest fire — `igraph_forest_fire_game`~~
-* ~~Rewire  — `igraph_rewire`~~
-* ~~Growing random — `igraph_growing_random_game`~~
-* ~~Callaway traits — `igraph_callaway_traits_game`~~
+* Graph::GRG  — `igraph_grg_game`
+* Graph::Barabasi — `igraph_barabasi_game`
+* Graph::ErdosRenyi — `igraph_erdos_renyi_game`
+* Graph::WattsStrogatz — `igraph_watts_strogatz_game`
+* rewire_edges — `igraph_rewire_edges`
+* Graph::DegreeSequence — `igraph_degree_sequence_game`
+* Graph::kRegular  — `igraph_k_regular_game`
+* Graph::StaticFitness — `igraph_static_fitness_game`
+* Graph::StaticPowerLaw — `igraph_static_power_law_game`
+* Graph::ForestFire — `igraph_forest_fire_game`
+* rewire  — `igraph_rewire`
+* GrowingRandom — `igraph_growing_random_game`
+* ~~CallawayTraits — `igraph_callaway_traits_game`~~
 * ~~Establishment — `igraph_establishment_game`~~
 * ~~Preference — `igraph_preference_game`~~
-* ~~Asymmetric preference — `igraph_asymmetric_preference_game`~~
-* ~~Recent degree — `igraph_recent_degree_game`~~
-* ~~Barabási aging — `igraph_barabasi_aging_game`~~
-* ~~Recent degree aging — `igraph_recent_degree_aging_game`~~
-* ~~Cited type — `igraph_cited_type_game`~~
-* ~~Citing cited type — `igraph_citing_cited_type`~~
-* ~~Stochastic block model — `igraph_sbm_game`~~
+* ~~AsymmetricPreference — `igraph_asymmetric_preference_game`~~
+* ~~RecentDegree — `igraph_recent_degree_game`~~
+* ~~BarabásiAging — `igraph_barabasi_aging_game`~~
+* ~~RecentDegreeAging — `igraph_recent_degree_aging_game`~~
+* ~~CitedType — `igraph_cited_type_game`~~
+* ~~CitingCitedType — `igraph_citing_cited_type`~~
+* ~~StochasticBlockModel — `igraph_sbm_game`~~
 
 ## Games on graphs
 

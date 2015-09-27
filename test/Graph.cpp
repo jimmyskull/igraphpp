@@ -1,4 +1,6 @@
 
+#include <cmath>
+
 #include <catch.hpp>
 
 #include "../igraphpp/igraph.hpp"
@@ -199,4 +201,31 @@ TEST_CASE("Graph — deterministic generators", "[Graph]") {
   CHECK(gnei.ecount() == 3);
   gnei.connect_neighborhood(2);
   CHECK(gnei.ecount() == 5);
+
+  // Graph grg = Graph::GRG(10, std::sqrt(2.0) / 2.0, true);
+  // CHECK(grg.vcount() == 10);
+  // CHECK(grg.ecount() == 10 * 9 / 2);
+
+  // Graph barabasi = Graph::Barabasi(100);
+
+  Graph er = Graph::ErdosRenyi(100, 0.1);
+  CHECK(er.vcount() == 100);
+
+  Graph ws = Graph::WattsStrogatz(1, 100, 5, 0.01);
+  CHECK(ws.vcount() == 100);
+  ws.rewire_edges(0.4);
+
+  Graph ds = Graph::DegreeSequence(Vector({1, 2, 3, 1, 1}));
+  CHECK_FALSE(ds.is_directed());
+  ds = Graph::DegreeSequence(Vector({1, 2, 3, 1, 1}), Vector({1, 2, 3, 1, 1}));
+  CHECK(ds.is_directed());
+
+  Graph reg = Graph::kRegular(10, 2);
+  CHECK(reg.vcount() == 10);
+  CHECK(reg.ecount() == 20);
+
+  Graph spl = Graph::StaticPowerLaw(10, 20, 2.0);
+
+  Graph ff = Graph::ForestFire(10000, 0.37, 0.32 / 0.37);
+  ff.rewire(100);
 }

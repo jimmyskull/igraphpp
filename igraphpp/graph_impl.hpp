@@ -302,21 +302,116 @@ inline void Graph::connect_neighborhood(int order, NeighborMode mode) {
                                        static_cast<igraph_neimode_t>(mode)));
 }
 
-inline Graph Graph::ErdosRenyiGame(int vertices, double prob, Directedness dir,
-                                   Loops loops) {
+/* Randomized graph generators */
+inline Graph Graph::GRG(int vertices, double radius, bool torus) {
   igraph_t graph;
-  int ret = igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, vertices,
-                                    prob, dir, loops);
-  SafeCall(ret);
+  SafeCall(igraph_grg_game(&graph, vertices, radius, torus, NULL, NULL));
   return Graph(graph);
 }
-
-inline Graph Graph::ErdosRenyiGame(int vertices, int edges, Directedness dir,
-                                   Loops loops) {
+inline Graph Graph::Barabasi(int vertices, double power, int m, bool outpref,
+                             double A, Directedness dir, BarabasiAlgorithm algo,
+                             const Graph &start_graph) {
   igraph_t graph;
-  int ret = igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNM, vertices,
-                                    edges, dir, loops);
-  SafeCall(ret);
+  const igraph_t *start = start_graph.vcount() ? start_graph.ptr() : NULL;
+  SafeCall(igraph_barabasi_game(
+      &graph, vertices, power, m, NULL, outpref, A, dir,
+      static_cast<igraph_barabasi_algorithm_t>(algo), start));
+  return Graph(graph);
+}
+inline Graph Graph::Barabasi(int vertices, double power, const Vector &outseq,
+                             bool outpref, double A, Directedness dir,
+                             BarabasiAlgorithm algo, const Graph &start_graph) {
+  igraph_t graph;
+  const igraph_t *start = start_graph.vcount() ? start_graph.ptr() : NULL;
+  SafeCall(igraph_barabasi_game(
+      &graph, vertices, power, 0, outseq.ptr(), outpref, A, dir,
+      static_cast<igraph_barabasi_algorithm_t>(algo), start));
+  return Graph(graph);
+}
+inline Graph Graph::ErdosRenyi(int vertices, double prob, Directedness dir,
+                               Loops loops) {
+  igraph_t graph;
+  SafeCall(igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, vertices,
+                                   prob, dir, loops));
+  return Graph(graph);
+}
+inline Graph Graph::ErdosRenyi(int vertices, int edges, Directedness dir,
+                               Loops loops) {
+  igraph_t graph;
+  SafeCall(igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNM, vertices,
+                                   edges, dir, loops));
+  return Graph(graph);
+}
+inline Graph Graph::WattsStrogatz(int dim, int size, int nei, double p,
+                                  Loops loops, bool multiple) {
+  igraph_t graph;
+  SafeCall(
+      igraph_watts_strogatz_game(&graph, dim, size, nei, p, loops, multiple));
+  return Graph(graph);
+}
+inline void Graph::rewire_edges(double prob, Loops loops, bool multiple) {
+  SafeCall(igraph_rewire_edges(ptr(), prob, loops, multiple));
+}
+inline Graph Graph::DegreeSequence(const VectorView &degrees,
+                                   DegreeSequenceMethod method) {
+  igraph_t graph;
+  SafeCall(igraph_degree_sequence_game(&graph, degrees.ptr(), NULL,
+                                       static_cast<igraph_degseq_t>(method)));
+  return Graph(graph);
+}
+inline Graph Graph::DegreeSequence(const VectorView &out_deq,
+                                   const VectorView &in_deq,
+                                   DegreeSequenceMethod method) {
+  igraph_t graph;
+  SafeCall(igraph_degree_sequence_game(&graph, out_deq.ptr(), in_deq.ptr(),
+                                       static_cast<igraph_degseq_t>(method)));
+  return Graph(graph);
+}
+inline Graph Graph::kRegular(int vertices, int k, Directedness dir,
+                             bool multiple) {
+  igraph_t graph;
+  SafeCall(igraph_k_regular_game(&graph, vertices, k, dir, multiple));
+  return Graph(graph);
+}
+inline Graph Graph::StaticFitness(int vertices, VectorView &fitness,
+                                  Loops loops, bool multiple) {
+  igraph_t graph;
+  SafeCall(igraph_static_fitness_game(&graph, vertices, fitness.ptr(), NULL,
+                                      loops, multiple));
+  return Graph(graph);
+}
+inline Graph Graph::StaticFitness(int vertices, VectorView &fitness_out,
+                                  VectorView &fitness_in, Loops loops,
+                                  bool multiple) {
+  igraph_t graph;
+  SafeCall(igraph_static_fitness_game(&graph, vertices, fitness_out.ptr(),
+                                      fitness_in.ptr(), loops, multiple));
+  return Graph(graph);
+}
+inline Graph Graph::StaticPowerLaw(int vertices, int edges, double exponent_out,
+                                   double exponent_in, Loops loops,
+                                   bool multiple,
+                                   bool finite_size_correlation) {
+  igraph_t graph;
+  SafeCall(igraph_static_power_law_game(&graph, vertices, edges, exponent_out,
+                                        exponent_in, loops, multiple,
+                                        finite_size_correlation));
+  return Graph(graph);
+}
+inline Graph Graph::ForestFire(int vertices, double fw_prob, double bw_factor,
+                               int pambs, Directedness dir) {
+  igraph_t graph;
+  SafeCall(igraph_forest_fire_game(&graph, vertices, fw_prob, bw_factor, pambs,
+                                   dir));
+  return Graph(graph);
+}
+inline void Graph::rewire(int trials, RewiringMode mode) {
+  SafeCall(igraph_rewire(ptr(), trials, static_cast<igraph_rewiring_t>(mode)));
+}
+inline Graph Graph::GrowingRandom(int vertices, int m, Directedness dir,
+                           bool citation) {
+  igraph_t graph;
+  SafeCall(igraph_growing_random_game(&graph, vertices, m, dir, citation));
   return Graph(graph);
 }
 

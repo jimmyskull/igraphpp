@@ -51,13 +51,30 @@ enum StarMode {
   StarOut = IGRAPH_STAR_OUT,
   StarIn = IGRAPH_STAR_IN,
   StarMutual = IGRAPH_STAR_MUTUAL,
-  StarUndirected = IGRAPH_STAR_UNDIRECTED,
+  StarUndirected = IGRAPH_STAR_UNDIRECTED
 };
 
 enum TreeMode {
   TreeOut = IGRAPH_TREE_OUT,
   TreeIn = IGRAPH_TREE_IN,
   TreeUndirected = IGRAPH_TREE_UNDIRECTED
+};
+
+enum BarabasiAlgorithm {
+  BarabasiBag = IGRAPH_BARABASI_BAG,
+  BarabasiPSumTree = IGRAPH_BARABASI_PSUMTREE,
+  BarabasiPSumTreeMultiple = IGRAPH_BARABASI_PSUMTREE_MULTIPLE
+};
+
+enum DegreeSequenceMethod {
+  DegreeSequenceSimple = IGRAPH_DEGSEQ_SIMPLE,
+  DegreeSequenceSimpleNoMultiple = IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE,
+  DegreeSequenceVL = IGRAPH_DEGSEQ_VL
+};
+
+enum RewiringMode {
+  RewiringSimple = IGRAPH_REWIRING_SIMPLE,
+  RewiringSimpleLoops = IGRAPH_REWIRING_SIMPLE_LOOPS
 };
 
 static inline int SetSeed(unsigned long int seed) {

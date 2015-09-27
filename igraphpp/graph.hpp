@@ -120,12 +120,50 @@ public:
   static Graph ExtendedChordalRing(int vertices, const Matrix &W);
   void connect_neighborhood(int order, NeighborMode mode = Out);
 
-  static Graph ErdosRenyiGame(int vertices, double prob,
-                              Directedness dir = Undirected,
-                              Loops loops = NoLoops);
-  static Graph ErdosRenyiGame(int vertices, int edges,
-                              Directedness dir = Undirected,
-                              Loops loops = NoLoops);
+  /* Randomized graph generators */
+  static Graph GRG(int vertices, double radius, bool torus);
+  static Graph Barabasi(int vertices, double power = 1, int m = 2,
+                        bool outpref = false, double A = 1,
+                        Directedness dir = Directed,
+                        BarabasiAlgorithm algo = BarabasiPSumTree,
+                        const Graph &start_graph = Graph());
+  static Graph Barabasi(int vertices, double power, const Vector &outseq,
+                        bool outpref = false, double A = 1,
+                        Directedness dir = Directed,
+                        BarabasiAlgorithm algo = BarabasiPSumTree,
+                        const Graph &start_graph = Graph());
+  static Graph ErdosRenyi(int vertices, double prob,
+                          Directedness dir = Undirected, Loops loops = NoLoops);
+  static Graph ErdosRenyi(int vertices, int edges,
+                          Directedness dir = Undirected, Loops loops = NoLoops);
+  static Graph WattsStrogatz(int dim, int size, int nei, double p,
+                             Loops loops = NoLoops, bool multiple = false);
+  // Rewire uniformly
+  void rewire_edges(double prob, Loops loops = NoLoops, bool multiple = false);
+  static Graph
+  DegreeSequence(const VectorView &degrees,
+                 DegreeSequenceMethod method = DegreeSequenceSimple);
+  static Graph
+  DegreeSequence(const VectorView &out_deq, const VectorView &in_deq,
+                 DegreeSequenceMethod method = DegreeSequenceSimple);
+  static Graph kRegular(int vertices, int k, Directedness dir = Directed,
+                        bool multiple = false);
+  static Graph StaticFitness(int vertices, VectorView &fitness,
+                             Loops loops = NoLoops, bool multiple = false);
+  static Graph StaticFitness(int vertices, VectorView &fitness_out,
+                             VectorView &fitness_in, Loops loops = NoLoops,
+                             bool multiple = false);
+  static Graph StaticPowerLaw(int vertices, int edges, double exponent_out,
+                              double exponent_in = -1.0, Loops loops = NoLoops,
+                              bool multiple = false,
+                              bool finite_size_correlation = true);
+  static Graph ForestFire(int vertices, double fw_prob, double bw_factor = 1.0,
+                          int pambs = 1, Directedness dir = Undirected);
+  // Rewire keeping the degree distribution
+  void rewire(int trials, RewiringMode mode = RewiringSimple);
+  static Graph GrowingRandom(int vertices, int m = 1,
+                             Directedness dir = Directed,
+                             bool citation = false);
 
   igraph_t *ptr() { return &graph_; }
   const igraph_t *ptr() const { return &graph_; }
