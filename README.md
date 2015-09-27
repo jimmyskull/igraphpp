@@ -113,9 +113,9 @@ exception mechanism to handle errors.
 
 ### Structural properties
 * Basic properties
-* Shortest path related functions
-* ~~Neighborhood~~
-* ~~Graph components~~
+* Shortest path related functions — *Partial* 12/18
+* Neighborhood — *Partial* 1/3
+* Graph components — *Partial* 5/7
 * ~~Degree sequences~~
 * ~~Centrality measures~~
 * ~~Estimating centality measures~~

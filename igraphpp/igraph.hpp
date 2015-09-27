@@ -79,6 +79,11 @@ enum RewiringMode {
   RewiringSimpleLoops = IGRAPH_REWIRING_SIMPLE_LOOPS
 };
 
+enum SubgraphImplementation {
+  SubgraphCopyAndDelete = IGRAPH_SUBGRAPH_COPY_AND_DELETE,
+  SubgraphCreateFromScratch = IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH
+};
+
 static inline int SetSeed(unsigned long int seed) {
   igraph_rng_t *rng = igraph_rng_default();
   int ret = igraph_rng_seed(rng, seed);

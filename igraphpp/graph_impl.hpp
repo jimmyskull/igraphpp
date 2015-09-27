@@ -631,7 +631,7 @@ inline int Graph::girth() const {
   SafeCall(igraph_girth(ptr(), &girth, NULL));
   return girth;
 }
-inline int Graph::girth(Vector &circle) const {
+inline int Graph::girth(VectorView &circle) const {
   int girth;
   SafeCall(igraph_girth(ptr(), &girth, circle.ptr()));
   return girth;
@@ -643,8 +643,8 @@ inline Vector Graph::eccentricity(const VertexSelector &vids,
                                static_cast<igraph_neimode_t>(mode)));
   return result;
 }
-inline Vector Graph::eccentricity(int vertex, NeighborMode mode) const {
-  return eccentricity(VertexSelector::Single(vertex), mode);
+inline double Graph::eccentricity(int vertex, NeighborMode mode) const {
+  return eccentricity(VertexSelector::Single(vertex), mode).at(0);
 }
 inline double Graph::radius(NeighborMode mode) const {
   double radius;
@@ -652,12 +652,58 @@ inline double Graph::radius(NeighborMode mode) const {
   return radius;
 }
 
+/* Neighborhood of a vertex */
+inline Vector Graph::neighborhood_size(const VertexSelector &vids, int order,
+                                       NeighborMode mode) const {
+  Vector result;
+  SafeCall(igraph_neighborhood_size(ptr(), result.ptr(), vids.vs(), order,
+                                    static_cast<igraph_neimode_t>(mode)));
+  return result;
+}
+inline double Graph::neighborhood_size(int vertex, int order,
+                                       NeighborMode mode) const {
+  return neighborhood_size(VertexSelector::Single(vertex), order, mode).at(0);
+}
+
+/* Graph components */
+inline Vector Graph::subcomponent(int vertex, NeighborMode mode) const {
+  Vector result;
+  SafeCall(igraph_subcomponent(ptr(), result.ptr(), static_cast<double>(vertex),
+                               static_cast<igraph_neimode_t>(mode)));
+  return result;
+}
+inline Graph
+Graph::induced_subgraph(const VertexSelector &vids,
+                        SubgraphImplementation implementation) const {
+  igraph_t graph;
+  SafeCall(igraph_induced_subgraph(
+      ptr(), &graph, vids.vs(),
+      static_cast<igraph_subgraph_implementation_t>(implementation)));
+  return Graph(graph);
+}
+inline Graph Graph::subgraph_edges(const EdgeSelector &eids,
+                                   bool delete_vertices) const {
+  igraph_t graph;
+  SafeCall(igraph_subgraph_edges(ptr(), &graph, eids.es(), delete_vertices));
+  return Graph(graph);
+}
+inline Clusters Graph::clusters(Connectedness mode) const {
+  Clusters clusters;
+  SafeCall(igraph_clusters(ptr(), clusters.membership.ptr(),
+                           clusters.csize.ptr(), &clusters.number_of_clusters,
+                           static_cast<igraph_connectedness_t>(mode)));
+  return clusters;
+}
 inline bool Graph::is_connected(Connectedness mode) const {
-  igraph_bool_t connected;
-  igraph_connectedness_t m = static_cast<igraph_connectedness_t>(mode);
-  int ret = igraph_is_connected(&graph_, &connected, m);
-  SafeCall(ret);
+  int connected;
+  SafeCall(igraph_is_connected(&graph_, &connected,
+    static_cast<igraph_connectedness_t>(mode)));
   return static_cast<bool>(connected);
+}
+inline Vector Graph::articulation_points() const {
+  Vector vector;
+  SafeCall(igraph_articulation_points(ptr(), vector.ptr()));
+  return vector;
 }
 
 inline Graph::Graph(const igraph_t &graph) : graph_(graph) {}

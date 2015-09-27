@@ -21,6 +21,12 @@ namespace igraph {
 class Vector;
 class VertexSelector;
 
+struct Clusters {
+  Vector membership;
+  Vector csize;
+  int number_of_clusters;
+};
+
 class Graph {
 public:
   /* Constructors and Destructors */
@@ -253,13 +259,34 @@ public:
                            Directedness dir = Directed,
                            bool unconnected = true) const;
   int girth() const;
-  int girth(Vector &circle) const;
+  int girth(VectorView &circle) const;
   Vector eccentricity(const VertexSelector &vids,
                       NeighborMode mode = Out) const;
-  Vector eccentricity(int vertex, NeighborMode mode = Out) const;
+  double eccentricity(int vertex, NeighborMode mode = Out) const;
   double radius(NeighborMode mode = Out) const;
 
+  /* Neighborhood of a vertex */
+  Vector neighborhood_size(const VertexSelector &vids, int order = 1,
+                           NeighborMode mode = Out) const;
+  double neighborhood_size(int vertex, int order = 1,
+                           NeighborMode mode = Out) const;
+  // Skipped igraph_neighborhood
+  // Skipped igraph_neighborhood_graphs
+
+  /* Graph components */
+  Vector subcomponent(int vertex, NeighborMode mode = Out) const;
+  Graph induced_subgraph(
+      const VertexSelector &vids,
+      SubgraphImplementation implementation = SubgraphCreateFromScratch) const;
+  Graph subgraph_edges(const EdgeSelector &eids,
+                       bool delete_vertices = true) const;
+  Clusters clusters(Connectedness mode = WeaklyConnected) const;
   bool is_connected(Connectedness mode = WeaklyConnected) const;
+  // Skipped igraph_decompose
+  // Skipped igraph_decompose_destroy
+  // Skipped igraph_biconnected_components
+  Vector articulation_points() const;
+
 
   igraph_t *ptr() { return &graph_; }
   const igraph_t *ptr() const { return &graph_; }

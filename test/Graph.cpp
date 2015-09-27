@@ -314,5 +314,39 @@ TEST_CASE("Graph — shortest path related functions", "[Graph]") {
   CHECK(circle == Vector({1, 0, 3}));
 
   CHECK(g.eccentricity(VertexSelector::All()) == Vector({1, 2, 2, 2}));
+  CHECK(g.eccentricity(1) == 2);
   CHECK(g.radius() == 1);
+}
+
+TEST_CASE("Graph — neighborhood of a vertex", "[Graph]") {
+  using igraph::Graph;
+  using igraph::Vector;
+
+  Graph g{{0, 1, 0, 2, 0, 3, 0, 4, 2, 5, 2, 6, 3, 5}};
+  REQUIRE(g.ecount() == 7);
+  REQUIRE(g.vcount() == 7);
+
+  CHECK(g.neighborhood_size(0) == 5);
+  CHECK(g.neighborhood_size({{1, 5}}) == Vector({2, 3}));
+}
+
+TEST_CASE("Graph — graph components", "[Graph]") {
+  using igraph::Graph;
+  using igraph::Vector;
+
+  Graph g{{0, 1, 0, 2, 0, 3, 0, 4, 2, 5, 2, 6, 8, 9, 8, 10}};
+  REQUIRE(g.ecount() == 8);
+  REQUIRE(g.vcount() == 11);
+
+  CHECK(g.subcomponent(0).size() == 7);
+  CHECK(g.subcomponent(10).size() == 3);
+  Graph sub(g.induced_subgraph(g.subcomponent(0)));
+  CHECK(sub.vcount() == 7);
+  CHECK(g.subgraph_edges({{1, 4}}).diameter() == 2);
+
+  CHECK(g.clusters().number_of_clusters == 3);
+
+  CHECK_FALSE(g.is_connected());
+
+  CHECK(g.articulation_points().size() == 3);
 }
