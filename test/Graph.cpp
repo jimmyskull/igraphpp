@@ -350,3 +350,13 @@ TEST_CASE("Graph — graph components", "[Graph]") {
 
   CHECK(g.articulation_points().size() == 3);
 }
+
+TEST_CASE("Graph — degree sequences", "[Graph]") {
+  using igraph::Graph;
+
+  CHECK_FALSE(Graph::is_degree_sequence({{0, 2, 3, 0, 4, 3, 1, 3, 4, 2}},
+                                        {{0, 3, 1, 2, 2, 4, 4, 1, 3, 1}}));
+
+  CHECK(Graph::is_graphical_degree_sequence({{1, 3, 2, 1, 3, 4, 3, 3, 1, 3}},
+                                            {{4, 1, 2, 3, 2, 3, 2, 3, 2, 2}}));
+}

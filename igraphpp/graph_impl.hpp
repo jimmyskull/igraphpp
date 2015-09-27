@@ -697,13 +697,29 @@ inline Clusters Graph::clusters(Connectedness mode) const {
 inline bool Graph::is_connected(Connectedness mode) const {
   int connected;
   SafeCall(igraph_is_connected(&graph_, &connected,
-    static_cast<igraph_connectedness_t>(mode)));
+                               static_cast<igraph_connectedness_t>(mode)));
   return static_cast<bool>(connected);
 }
 inline Vector Graph::articulation_points() const {
   Vector vector;
   SafeCall(igraph_articulation_points(ptr(), vector.ptr()));
   return vector;
+}
+
+/* Degree sequences */
+inline bool Graph::is_degree_sequence(const Vector &out_degrees,
+                                      const Vector &in_degrees) {
+  int result;
+  SafeCall(
+      igraph_is_degree_sequence(out_degrees.ptr(), in_degrees.ptr(), &result));
+  return result != 0;
+}
+inline bool Graph::is_graphical_degree_sequence(const Vector &out_degrees,
+                                                const Vector &in_degrees) {
+  int result;
+  SafeCall(igraph_is_graphical_degree_sequence(out_degrees.ptr(),
+                                               in_degrees.ptr(), &result));
+  return result != 0;
 }
 
 inline Graph::Graph(const igraph_t &graph) : graph_(graph) {}

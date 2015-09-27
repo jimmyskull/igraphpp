@@ -116,7 +116,7 @@ exception mechanism to handle errors.
 * Shortest path related functions — *Partial* 12/18
 * Neighborhood — *Partial* 1/3
 * Graph components — *Partial* 5/7
-* ~~Degree sequences~~
+* Degree sequences
 * ~~Centrality measures~~
 * ~~Estimating centality measures~~
 * ~~Centralization~~

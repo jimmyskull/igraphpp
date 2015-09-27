@@ -287,6 +287,11 @@ public:
   // Skipped igraph_biconnected_components
   Vector articulation_points() const;
 
+  /* Degree sequences */
+  static bool is_degree_sequence(const Vector &out_degrees,
+                                 const Vector &in_degrees);
+  static bool is_graphical_degree_sequence(const Vector &out_degrees,
+                                           const Vector &in_degrees);
 
   igraph_t *ptr() { return &graph_; }
   const igraph_t *ptr() const { return &graph_; }
