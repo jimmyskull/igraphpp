@@ -144,13 +144,13 @@ exception mechanism to handle errors.
 * ~~Graph layouts~~
 * ~~Vertex separatos~~
 * ~~Community structure~~
-* ~~Graphlets~~
-* ~~Spectral coase graining~~
+* ~~Graphlets~~ — *Not planned*
+* ~~Spectral coase graining~~ — *Not planned*
 * ~~Graph operators~~
-* ~~BLAS~~
-* ~~Bipartite~~
-* ~~Multi-thread support~~
-* ~~Not graph-related functions~~
+* ~~BLAS~~ — *Not planned*
+* ~~Bipartite~~ — *Not planned*
+* ~~Multi-thread support~~ — *Not planned*
+* ~~Not graph-related functions~~ — *Not planned*
 
 
 

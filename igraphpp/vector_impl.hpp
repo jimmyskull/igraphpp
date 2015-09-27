@@ -174,7 +174,7 @@ inline Vector::~Vector() {
   if (VECTOR(*ptr()) != NULL)
     igraph_vector_destroy(ptr());
 }
-inline Vector::Vector(int long size) : VectorView() {
+inline Vector::Vector(long int size) : VectorView() {
   SafeCall(igraph_vector_init(ptr(), size));
 }
 inline Vector::Vector(const double *data, long int length) : VectorView() {
@@ -257,12 +257,13 @@ inline Vector Vector::operator/(const VectorView &b) const {
 
 /* Copying vectors */
 inline Vector &Vector::operator=(const VectorView &other) {
-  igraph_vector_update(ptr(), other.ptr());
+  if (this != &other)
+    SafeCall(igraph_vector_copy(ptr(), other.ptr()));
   return *this;
 }
 inline Vector &Vector::operator=(const Vector &other) {
   if (this != &other)
-    igraph_vector_update(ptr(), other.ptr());
+    SafeCall(igraph_vector_copy(ptr(), other.ptr()));
   return *this;
 }
 inline void Vector::append(const VectorView &other) {
@@ -307,6 +308,12 @@ inline Vector Vector::difference_sorted(const VectorView &other) const {
   Vector result;
   SafeCall(igraph_vector_difference_sorted(ptr(), other.ptr(), result.ptr()));
   return result;
+}
+
+inline Vector Vector::Repeat(double value, long int times) {
+  Vector vector(times);
+  vector.fill(value);
+  return vector;
 }
 
 inline Vector::Vector(const igraph_vector_t &vector) : VectorView() {

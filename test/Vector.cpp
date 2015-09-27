@@ -97,4 +97,7 @@ TEST_CASE("Vector", "[Vector]") {
   difference = std::move(intersect);
   Vector x(std::move(difference));
   Vector s(std::move(x));
+
+  Vector rep = Vector::Repeat(5, 4);
+  CHECK(rep == Vector({5, 5, 5, 5}));
 }

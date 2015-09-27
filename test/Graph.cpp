@@ -360,3 +360,29 @@ TEST_CASE("Graph — degree sequences", "[Graph]") {
   CHECK(Graph::is_graphical_degree_sequence({{1, 3, 2, 1, 3, 4, 3, 3, 1, 3}},
                                             {{4, 1, 2, 3, 2, 3, 2, 3, 2, 2}}));
 }
+
+TEST_CASE("Graph — centrality measures", "[Graph]") {
+  using igraph::Graph;
+  using igraph::VertexSelector;
+  using igraph::Vector;
+  using igraph::PageRank;
+
+  Graph g = Graph::Star(10);
+  Vector closeness = g.closeness(VertexSelector::All());
+  CHECK(closeness[0] == Approx(0.111111));
+  for (int i = 1; i < 10; ++i)
+    CHECK(closeness[i] == Approx(0.0111111));
+  CHECK(g.closeness(0, igraph::Out, Vector(1, g.ecount())) ==
+        Approx(0.0222222222));
+
+  g.add_edges({1, 2, 2, 3, 4, 7});
+  Vector betweenness = g.betweenness(VertexSelector::All());
+  CHECK(betweenness == Vector({0, 0, 1, 0, 0, 0, 0, 0, 0, 0}));
+  CHECK(g.betweenness(2) == 1);
+
+  betweenness = g.edge_betweenness();
+  CHECK(betweenness == Vector({1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1}));
+
+  PageRank pr = g.pagerank();
+  CHECK(pr.scores[4] == Approx(0.0758368));
+}

@@ -722,6 +722,52 @@ inline bool Graph::is_graphical_degree_sequence(const Vector &out_degrees,
   return result != 0;
 }
 
+/* Centrality measures */
+inline Vector Graph::closeness(const VertexSelector &vids, NeighborMode mode,
+                               const VectorView &weights,
+                               bool normalized) const {
+  Vector result;
+  SafeCall(igraph_closeness(
+      ptr(), result.ptr(), vids.vs(), static_cast<igraph_neimode_t>(mode),
+      weights.is_none() ? NULL : weights.ptr(), normalized));
+  return result;
+}
+inline double Graph::closeness(int vertex, NeighborMode mode,
+                               const VectorView &weights,
+                               bool normalized) const {
+  return closeness(VertexSelector::Single(vertex), mode, weights, normalized)
+      .at(0);
+}
+inline Vector Graph::betweenness(const VertexSelector &vids, Directedness dir,
+                                 const VectorView &weights,
+                                 bool nobigint) const {
+  Vector result;
+  SafeCall(igraph_betweenness(ptr(), result.ptr(), vids.vs(), dir,
+                              weights.ptr(), nobigint));
+  return result;
+}
+inline double Graph::betweenness(int vertex, Directedness dir,
+                                 const VectorView &weights,
+                                 bool nobigint) const {
+  return betweenness(VertexSelector::Single(vertex), dir, weights, nobigint)
+      .at(0);
+}
+inline Vector Graph::edge_betweenness(Directedness dir,
+                                      const VectorView &weights) const {
+  Vector result;
+  SafeCall(igraph_edge_betweenness(ptr(), result.ptr(), dir, weights.ptr()));
+  return result;
+}
+inline PageRank Graph::pagerank(const VertexSelector &vids, Directedness dir,
+                                double damping,
+                                const VectorView &weights) const {
+  PageRank result;
+  SafeCall(igraph_pagerank(ptr(), IGRAPH_PAGERANK_ALGO_PRPACK,
+                           result.scores.ptr(), &result.eigenvalue, vids.vs(),
+                           dir, damping, weights.ptr(), NULL));
+  return result;
+}
+
 inline Graph::Graph(const igraph_t &graph) : graph_(graph) {}
 
 } // namespace igraph

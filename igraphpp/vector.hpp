@@ -86,8 +86,8 @@ public:
   void sort() noexcept;
 
   /* Internal use */
-  const igraph_vector_t *ptr() const { return &vector_; }
-  igraph_vector_t *ptr() { return &vector_; }
+  const igraph_vector_t *ptr() const { return is_none() ? NULL : &vector_; }
+  igraph_vector_t *ptr() { return is_none() ? NULL : &vector_; }
 
   class iterator : public std::iterator<std::forward_iterator_tag, double> {
   public:
@@ -132,21 +132,28 @@ public:
   const_iterator cbegin() const { return const_iterator(ptr(), 0); }
   const_iterator cend() const { return const_iterator(ptr(), size()); }
 
+  static VectorView None() {
+    static VectorView instance = VectorView(true);
+    return instance;
+  }
+  bool is_none() const { return none_vector_; }
+
 protected:
   VectorView() = default;
 
 private:
-  igraph_vector_t vector_;
-
-private:
   VectorView(const VectorView &) = default;
+  VectorView(bool none_vector) : none_vector_(none_vector) {}
+
+  igraph_vector_t vector_;
+  bool none_vector_ = false;
 };
 
 class Vector : public VectorView {
 public:
   /* Constructors and Destructors */
   ~Vector();
-  explicit Vector(int long size = 0);
+  explicit Vector(long int size = 0);
   Vector(const double *data, long int length);
   Vector(double from, double to);
   Vector(std::initializer_list<double> list);
@@ -188,6 +195,8 @@ public:
   /* Set operations on sorted vectors */
   Vector intersect_sorted(const VectorView &other) const;
   Vector difference_sorted(const VectorView &other) const;
+
+  static Vector Repeat(double value, long int times);
 
 private:
   explicit Vector(const igraph_vector_t &vector);

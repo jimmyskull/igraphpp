@@ -161,4 +161,7 @@ TEST_CASE("VectorView", "[VectorView]") {
 
   std::vector<double> cvvb{vb.cbegin(), vb.cend()};
   CHECK(Vector(cvvb.begin(), cvvb.end()) == Vector({10, 9, 6, 2, 1}));
+
+  CHECK_FALSE(va.is_none());
+  CHECK(VectorView::None().is_none());
 }
