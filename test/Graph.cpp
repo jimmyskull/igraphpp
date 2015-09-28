@@ -388,6 +388,6 @@ TEST_CASE("Graph — centrality measures", "[Graph]") {
 
   CHECK(g.constraint(0) == Approx(0.198217));
   CHECK(g.maxdegree() == 9);
-  CHECK(g.strength() == 9);
+  CHECK(g.strength(0) == 9);
   // WARN("" << g.strength(0));
 }
