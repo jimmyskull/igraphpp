@@ -5,6 +5,8 @@
 #error "You must include igraph.hpp first"
 #endif
 
+#include "./vertex_selector.hpp"
+
 #include <type_traits>
 
 #include <igraph.h>
@@ -14,21 +16,30 @@
 namespace igraph {
 
 inline VertexSelector::~VertexSelector() { igraph_vs_destroy(ptr()); }
-
 inline VertexSelector::VertexSelector(const VertexSelector &vs) {
   SafeCall(igraph_vs_copy(ptr(), vs.ptr()));
+}
+inline VertexSelector::VertexSelector(std::initializer_list<double> list) {
+  Vector vector(list);
+  SafeCall(igraph_vs_vector_copy(ptr(), vector.ptr()));
+}
+template <typename Iterator, typename>
+VertexSelector::VertexSelector(Iterator begin, Iterator end) {
+  Vector vector(begin, end);
+  SafeCall(igraph_vs_vector_copy(ptr(), vector.ptr()));
+}
+inline VertexSelector::VertexSelector(const VectorView &vector) {
+  SafeCall(igraph_vs_vector_copy(ptr(), vector.ptr()));
 }
 
 inline bool VertexSelector::is_all() const noexcept {
   return igraph_vs_is_all(ptr());
 }
-
 inline int VertexSelector::size(const Graph &graph) const noexcept {
   int result;
   SafeCall(igraph_vs_size(graph.ptr(), ptr(), &result));
   return result;
 }
-
 inline int VertexSelector::type() const noexcept {
   return igraph_vs_type(ptr());
 }
@@ -53,16 +64,13 @@ inline VertexSelector VertexSelector::None() {
   return instance;
 }
 inline VertexSelector VertexSelector::Single(int vid) {
-  static VertexSelector instance(igraph_vss_1(vid));
-  return instance;
+  return VertexSelector(igraph_vss_1(vid));
 }
 inline VertexSelector VertexSelector::FromVector(const VectorView &vector) {
-  static VertexSelector instance(igraph_vss_vector(vector.ptr()));
-  return instance;
+  return VertexSelector(igraph_vss_vector(vector.ptr()));
 }
 inline VertexSelector VertexSelector::Sequence(int from, int to) {
-  static VertexSelector instance(igraph_vss_seq(from, to));
-  return instance;
+  return VertexSelector(igraph_vss_seq(from, to));
 }
 template <typename... Args, typename>
 inline VertexSelector VertexSelector::Small(Args... args) {

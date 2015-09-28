@@ -7,7 +7,7 @@ int main(void) {
   using std::cout;
 
   Graph g = Graph(10);
-  g.AddEdge(0, 1).AddEdge(0, 9);
+  g.add_edges({0, 1, 0, 9});
 
   cout << "Vertices : " << g.vcount() << "\n";
   cout << "Edges    : " << g.ecount() << "\n";

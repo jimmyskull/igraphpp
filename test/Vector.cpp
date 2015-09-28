@@ -1,4 +1,6 @@
 
+#include <utility>
+
 #include <catch.hpp>
 
 #include "../igraphpp/igraph.hpp"
@@ -22,7 +24,11 @@ TEST_CASE("Vector", "[Vector]") {
   Vector va(a, N);
   Vector vb(a, N);
 
+  Vector lst({1, 10});
+  CHECK(lst.size() == 2);
+
   Vector seq(1, 5);
+  CHECK(seq.size() == 5);
   CHECK(va == vb);
 
   CHECK(va.size() == 5);
@@ -87,4 +93,11 @@ TEST_CASE("Vector", "[Vector]") {
   CHECK(intersect[2] == 3);
   CHECK(intersect[3] == 4);
   CHECK(intersect[4] == 5);
+
+  difference = std::move(intersect);
+  Vector x(std::move(difference));
+  Vector s(std::move(x));
+
+  Vector rep = Vector::Repeat(5, 4);
+  CHECK(rep == Vector({5, 5, 5, 5}));
 }

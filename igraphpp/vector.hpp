@@ -5,9 +5,13 @@
 #error "You must include igraph.hpp first"
 #endif
 
+#include <initializer_list>
+#include <type_traits>
+
 #include <igraph.h>
 
 #include "./exception.hpp"
+#include "./util.hpp"
 
 namespace igraph {
 
@@ -82,26 +86,80 @@ public:
   void sort() noexcept;
 
   /* Internal use */
-  const igraph_vector_t *ptr() const { return &vector_; }
-  igraph_vector_t *ptr() { return &vector_; }
+  const igraph_vector_t *ptr() const { return is_none() ? NULL : &vector_; }
+  igraph_vector_t *ptr() { return is_none() ? NULL : &vector_; }
+
+  class iterator : public std::iterator<std::forward_iterator_tag, double> {
+  public:
+    iterator(igraph_vector_t *vec, long int pos) : vec_(vec), pos_(pos) {}
+    iterator(const iterator &itr) : vec_(itr.vec_), pos_(itr.pos_) {}
+    iterator &operator++() {
+      ++pos_;
+      return *this;
+    }
+    bool operator==(const iterator &rhs) const { return pos_ == rhs.pos_; }
+    bool operator!=(const iterator &rhs) const { return pos_ != rhs.pos_; }
+    double &operator*() { return VECTOR(*vec_)[pos_]; }
+
+  private:
+    igraph_vector_t *vec_;
+    long int pos_;
+  };
+
+  class const_iterator
+      : public std::iterator<std::forward_iterator_tag, double> {
+  public:
+    const_iterator(const igraph_vector_t *vec, long int pos)
+        : vec_(vec), pos_(pos) {}
+    const_iterator(const const_iterator &itr)
+        : vec_(itr.vec_), pos_(itr.pos_) {}
+    const_iterator &operator++() {
+      ++pos_;
+      return *this;
+    }
+    bool operator==(const const_iterator &rhs) { return pos_ == rhs.pos_; }
+    bool operator!=(const const_iterator &rhs) { return pos_ != rhs.pos_; }
+    double operator*() const { return VECTOR(*vec_)[pos_]; }
+
+  private:
+    const igraph_vector_t *vec_;
+    long int pos_;
+  };
+
+  iterator begin() { return iterator(ptr(), 0); }
+  iterator end() { return iterator(ptr(), size()); }
+
+  const_iterator cbegin() const { return const_iterator(ptr(), 0); }
+  const_iterator cend() const { return const_iterator(ptr(), size()); }
+
+  static VectorView None() {
+    static VectorView instance = VectorView(true);
+    return instance;
+  }
+  bool is_none() const { return none_vector_; }
 
 protected:
   VectorView() = default;
-
-private:
-  igraph_vector_t vector_;
+  VectorView(bool none_vector) : none_vector_(none_vector) {}
 
 private:
   VectorView(const VectorView &) = default;
+
+  igraph_vector_t vector_;
+  bool none_vector_ = false;
 };
 
 class Vector : public VectorView {
 public:
   /* Constructors and Destructors */
   ~Vector();
-  explicit Vector(int long size = 0);
+  explicit Vector(long int size = 0);
   Vector(const double *data, long int length);
   Vector(double from, double to);
+  Vector(std::initializer_list<double> list);
+  template <typename Iterator, typename = typename std::enable_if<
+                                   util::is_iterator<Iterator>::value>::type>
+  Vector(Iterator begin, Iterator end);
   Vector(const Vector &other);
   Vector(const VectorView &other);
   Vector(Vector &&other);
@@ -138,8 +196,13 @@ public:
   Vector intersect_sorted(const VectorView &other) const;
   Vector difference_sorted(const VectorView &other) const;
 
+  static Vector Repeat(double value, long int times);
+
 private:
   explicit Vector(const igraph_vector_t &vector);
+
+  void disown() { VECTOR(*ptr()) = NULL; }
+  bool owner() const { return VECTOR(*ptr()) != NULL; }
 };
 
 } // namespace igraph

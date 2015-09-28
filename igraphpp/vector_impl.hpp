@@ -174,7 +174,7 @@ inline Vector::~Vector() {
   if (VECTOR(*ptr()) != NULL)
     igraph_vector_destroy(ptr());
 }
-inline Vector::Vector(int long size) : VectorView() {
+inline Vector::Vector(long int size) : VectorView() {
   SafeCall(igraph_vector_init(ptr(), size));
 }
 inline Vector::Vector(const double *data, long int length) : VectorView() {
@@ -184,20 +184,38 @@ inline Vector::Vector(const double *data, long int length) : VectorView() {
 inline Vector::Vector(double from, double to) : VectorView() {
   SafeCall(igraph_vector_init_seq(ptr(), from, to));
 }
-inline Vector::Vector(const Vector &other) : VectorView() {
-  SafeCall(igraph_vector_copy(ptr(), other.ptr()));
+inline Vector::Vector(std::initializer_list<double> list) {
+  SafeCall(igraph_vector_init(ptr(), 0));
+  reserve(static_cast<long int>(list.size()));
+  auto begin = list.begin();
+  auto end = list.end();
+  for (; begin != end; ++begin) {
+    push_back(static_cast<double>(*begin));
+  }
 }
-inline Vector::Vector(const VectorView &other) : VectorView() {
-  SafeCall(igraph_vector_copy(ptr(), other.ptr()));
+template <typename Iterator, typename>
+Vector::Vector(Iterator begin, Iterator end)
+    : VectorView() {
+  SafeCall(igraph_vector_init(ptr(), 0));
+  for (; begin != end; ++begin) {
+    push_back(static_cast<double>(*begin));
+  }
 }
-inline Vector::Vector(Vector &&other) : VectorView() {
+inline Vector::Vector(const Vector &other)
+    : Vector(static_cast<const VectorView &>(other)) {}
+inline Vector::Vector(const VectorView &other) : VectorView(other.is_none()) {
+  if (!other.is_none())
+    SafeCall(igraph_vector_copy(ptr(), other.ptr()));
+}
+inline Vector::Vector(Vector &&other) : VectorView(other.is_none()) {
   *ptr() = *other.ptr();
-  VECTOR(*other.ptr()) = NULL;
+  other.disown();
 }
 inline Vector &Vector::operator=(Vector &&other) {
-  this->~Vector();
+  if (owner())
+    igraph_vector_destroy(ptr());
   *ptr() = *other.ptr();
-  VECTOR(*other.ptr()) = NULL;
+  other.disown();
   return *this;
 }
 
@@ -241,12 +259,19 @@ inline Vector Vector::operator/(const VectorView &b) const {
 
 /* Copying vectors */
 inline Vector &Vector::operator=(const VectorView &other) {
-  igraph_vector_update(ptr(), other.ptr());
+  if (this == &other)
+    return *this;
+  if (owner() && !is_none())
+    this->~Vector();
+  SafeCall(igraph_vector_copy(ptr(), other.ptr()));
   return *this;
 }
 inline Vector &Vector::operator=(const Vector &other) {
-  if (this != &other)
-    igraph_vector_update(ptr(), other.ptr());
+  if (this == &other)
+    return *this;
+  if (owner() && !is_none())
+    this->~Vector();
+  SafeCall(igraph_vector_copy(ptr(), other.ptr()));
   return *this;
 }
 inline void Vector::append(const VectorView &other) {
@@ -291,6 +316,12 @@ inline Vector Vector::difference_sorted(const VectorView &other) const {
   Vector result;
   SafeCall(igraph_vector_difference_sorted(ptr(), other.ptr(), result.ptr()));
   return result;
+}
+
+inline Vector Vector::Repeat(double value, long int times) {
+  Vector vector(times);
+  vector.fill(value);
+  return vector;
 }
 
 inline Vector::Vector(const igraph_vector_t &vector) : VectorView() {

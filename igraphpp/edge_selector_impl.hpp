@@ -18,6 +18,18 @@ inline EdgeSelector::~EdgeSelector() { igraph_es_destroy(ptr()); }
 inline EdgeSelector::EdgeSelector(const EdgeSelector &es) {
   SafeCall(igraph_es_copy(ptr(), es.ptr()));
 }
+inline EdgeSelector::EdgeSelector(std::initializer_list<double> list) {
+  Vector vector(list);
+  SafeCall(igraph_es_vector_copy(ptr(), vector.ptr()));
+}
+template <typename Iterator, typename>
+EdgeSelector::EdgeSelector(Iterator begin, Iterator end) {
+  Vector vector(begin, end);
+  SafeCall(igraph_es_vector_copy(ptr(), vector.ptr()));
+}
+inline EdgeSelector::EdgeSelector(const VectorView &vector) {
+  SafeCall(igraph_es_vector_copy(ptr(), vector.ptr()));
+}
 
 inline bool EdgeSelector::is_all() const noexcept {
   return igraph_es_is_all(ptr());

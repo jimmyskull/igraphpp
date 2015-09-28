@@ -2,18 +2,12 @@
 
 #include <igraphpp/igraph.hpp>
 
-#include <time.h>
-
 int main(void) {
   using igraph::Graph;
   using std::cout;
 
   igraph::SetSeed(42);
-  float startTime = (float)clock() / CLOCKS_PER_SEC;
-  Graph g = Graph::ErdosRenyiGame(1000, 5.0 / 1000);
-  float endTime = (float)clock() / CLOCKS_PER_SEC;
-  float timeElapsed = endTime - startTime;
-  cout << "Time: " << timeElapsed << "\n";
+  Graph g = Graph::ErdosRenyi(1000, 5.0 / 1000);
 
   cout << "Vertices : " << g.vcount() << "\n";
   cout << "Edges    : " << g.ecount() << "\n";

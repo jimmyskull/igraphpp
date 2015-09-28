@@ -1,5 +1,5 @@
-#ifndef __IGRAPHPP_EXCEPTION_HPP_
-#define __IGRAPHPP_EXCEPTION_HPP_
+#ifndef IGRAPHPP_EXCEPTION_HPP_
+#define IGRAPHPP_EXCEPTION_HPP_
 
 #include <stdexcept>
 
@@ -29,4 +29,4 @@ static inline int SafeCall(int ret) {
 
 } // namespace igraph
 
-#endif // __IGRAPHPP_EXCEPTION_HPP_
+#endif // IGRAPHPP_EXCEPTION_HPP_

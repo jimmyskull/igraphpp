@@ -3,6 +3,11 @@
 *.lo
 *.o
 *.obj
+*.pyc
+
+.ycm_extra_conf.py
+
+.directory
 
 # Precompiled Headers
 *.gch

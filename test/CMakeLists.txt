@@ -9,6 +9,9 @@ add_executable(test_suite
   VertexSelector.cpp
   VertexIterator.cpp
   EdgeSelector.cpp
-  EdgeIterator.cpp)
+  EdgeIterator.cpp
+  VectorPtr.cpp
+  Matrix.cpp
+  Graph.cpp)
 
 target_link_libraries(test_suite ${IGRAPH_LIBRARIES})
