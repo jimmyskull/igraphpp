@@ -100,7 +100,7 @@ TEST_CASE("Graph — basic query operations", "[Graph]") {
   VertexSelector sel{{0, 1, 3}};
   CHECK(g.degree(sel) == Vector({2, 4, 1}));
 
-  CHECK(g.degree({0, 1, 3, 2}) == Vector({2, 4, 1, 2}));
+  CHECK(g.degree(1) == 4);
 }
 
 TEST_CASE("Graph — adding and deleting vertices and edges", "[Graph]") {
@@ -157,7 +157,7 @@ TEST_CASE("Graph — deterministic generators", "[Graph]") {
   CHECK(g.ecount() == 3);
 
   Graph star = Graph::Star(10, igraph::StarOut, 3);
-  CHECK(star.degree({3})[0] == 9);
+  CHECK(star.degree(3) == 9);
 
   Graph lat = Graph::Lattice(Vector({3, 3}), 1);
   CHECK(lat.vcount() == 9);
@@ -385,4 +385,9 @@ TEST_CASE("Graph — centrality measures", "[Graph]") {
 
   PageRank pr = g.pagerank();
   CHECK(pr.scores[4] == Approx(0.0758368));
+
+  CHECK(g.constraint(0) == Approx(0.198217));
+  CHECK(g.maxdegree() == 9);
+  CHECK(g.strength() == 9);
+  // WARN("" << g.strength(0));
 }

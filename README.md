@@ -117,7 +117,7 @@ exception mechanism to handle errors.
 * Neighborhood — *Partial* 1/3
 * Graph components — *Partial* 5/7
 * Degree sequences
-* ~~Centrality measures~~
+* Centrality measures — *Partial* ?/12
 * ~~Estimating centality measures~~
 * ~~Centralization~~
 * ~~Similarity measures~~

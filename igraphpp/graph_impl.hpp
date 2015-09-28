@@ -151,13 +151,8 @@ inline Vector Graph::degree(const VertexSelector &vids, NeighborMode mode,
                          static_cast<igraph_neimode_t>(mode), loops));
   return degrees;
 }
-inline Vector Graph::degree(std::initializer_list<double> vids,
-                            NeighborMode mode, Loops loops) const {
-  VertexSelector sel(vids);
-  Vector degrees;
-  SafeCall(igraph_degree(ptr(), degrees.ptr(), *sel.ptr(),
-                         static_cast<igraph_neimode_t>(mode), loops));
-  return degrees;
+inline double Graph::degree(int vertex, NeighborMode mode, Loops loops) const {
+  return degree(VertexSelector::Single(vertex), mode, loops).at(0);
 }
 
 inline Graph &Graph::add_edge(int from, int to) {
@@ -766,6 +761,35 @@ inline PageRank Graph::pagerank(const VertexSelector &vids, Directedness dir,
                            result.scores.ptr(), &result.eigenvalue, vids.vs(),
                            dir, damping, weights.ptr(), NULL));
   return result;
+}
+inline Vector Graph::constraint(const VertexSelector &vids,
+                                const VectorView &weights) const {
+  Vector result;
+  SafeCall(igraph_constraint(ptr(), result.ptr(), vids.vs(), weights.ptr()));
+  return result;
+}
+inline double Graph::constraint(int vertex, const VectorView &weights) const {
+  return constraint(VertexSelector::Single(vertex), weights).at(0);
+}
+inline int Graph::maxdegree(const VertexSelector &vids, NeighborMode mode,
+                            Loops loops) const {
+  int result;
+  SafeCall(igraph_maxdegree(ptr(), &result, vids.vs(),
+    static_cast<igraph_neimode_t>(mode), loops));
+  return result;
+}
+inline  Vector Graph::strength(const VertexSelector &vids ,
+                NeighborMode mode , Loops loops ,
+                const VectorView &weights ) const {
+  Vector result;
+  SafeCall(igraph_strength(ptr(), result.ptr(), vids.vs(),
+    static_cast<igraph_neimode_t>(mode), loops, weights.ptr()));
+  return result;
+}
+inline  double Graph::strength(int vertex,
+                NeighborMode mode , Loops loops ,
+                const VectorView &weights ) const {
+  return strength(VertexSelector::Single(vertex), mode, loops, weights).at(0);
 }
 
 inline Graph::Graph(const igraph_t &graph) : graph_(graph) {}

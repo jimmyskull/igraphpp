@@ -81,7 +81,7 @@ public:
   bool is_directed() const noexcept;
   Vector degree(const VertexSelector &vids = VertexSelector::All(),
                 NeighborMode mode = Out, Loops loops = NoLoops) const;
-  Vector degree(std::initializer_list<double> vids, NeighborMode mode = Out,
+  double degree(int vertex, NeighborMode mode = Out,
                 Loops loops = NoLoops) const;
 
   /* Adding and deleting vertices and edges */
@@ -265,14 +265,14 @@ public:
                            bool unconnected = true) const;
   int girth() const;
   int girth(VectorView &circle) const;
-  Vector eccentricity(const VertexSelector &vids,
+  Vector eccentricity(const VertexSelector &vids = VertexSelector::All(),
                       NeighborMode mode = Out) const;
   double eccentricity(int vertex, NeighborMode mode = Out) const;
   double radius(NeighborMode mode = Out) const;
 
   /* Neighborhood of a vertex */
-  Vector neighborhood_size(const VertexSelector &vids, int order = 1,
-                           NeighborMode mode = Out) const;
+  Vector neighborhood_size(const VertexSelector &vids = VertexSelector::All(),
+                           int order = 1, NeighborMode mode = Out) const;
   double neighborhood_size(int vertex, int order = 1,
                            NeighborMode mode = Out) const;
   // Skipped igraph_neighborhood
@@ -281,7 +281,7 @@ public:
   /* Graph components */
   Vector subcomponent(int vertex, NeighborMode mode = Out) const;
   Graph induced_subgraph(
-      const VertexSelector &vids,
+      const VertexSelector &vids = VertexSelector::All(),
       SubgraphImplementation implementation = SubgraphCreateFromScratch) const;
   Graph subgraph_edges(const EdgeSelector &eids,
                        bool delete_vertices = true) const;
@@ -299,13 +299,15 @@ public:
                                            const Vector &in_degrees);
 
   /* Centrality measures */
-  Vector closeness(const VertexSelector &vids, NeighborMode mode = Out,
+  Vector closeness(const VertexSelector &vids = VertexSelector::All(),
+                   NeighborMode mode = Out,
                    const VectorView &weights = VectorView::None(),
                    bool normalized = false) const;
   double closeness(int vertex, NeighborMode mode = Out,
                    const VectorView &weights = VectorView::None(),
                    bool normalized = false) const;
-  Vector betweenness(const VertexSelector &vids, Directedness dir = Directed,
+  Vector betweenness(const VertexSelector &vids = VertexSelector::All(),
+                     Directedness dir = Directed,
                      const VectorView &weights = VectorView::None(),
                      bool nobigint = true) const;
   double betweenness(int vertex, Directedness dir = Directed,
@@ -318,9 +320,18 @@ public:
                     const VectorView &weights = VectorView::None()) const;
   // Skipped igraph_personalized_pagerank
   // Skipped igraph_personalized_pagerank_vs
-  // igraph_constraint
-  // igraph_maxdegree
-  // igraph_strength
+  Vector constraint(const VertexSelector &vids = VertexSelector::All(),
+                    const VectorView &weights = VectorView::None()) const;
+  double constraint(int vertex,
+                    const VectorView &weights = VectorView::None()) const;
+  int maxdegree(const VertexSelector &vids = VertexSelector::All(),
+                NeighborMode mode = Out, Loops loops = NoLoops) const;
+  Vector strength(const VertexSelector &vids = VertexSelector::All(),
+                NeighborMode mode = Out, Loops loops = NoLoops,
+                const VectorView &weights = VectorView::None()) const;
+  double strength(int vertex,
+                NeighborMode mode = Out, Loops loops = NoLoops,
+                const VectorView &weights = VectorView::None()) const;
   // igraph_eigenvector_centrality
   // igraph_hub_score
   // igraph_authority_score
