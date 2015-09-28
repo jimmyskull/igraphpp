@@ -140,10 +140,10 @@ public:
 
 protected:
   VectorView() = default;
+  VectorView(bool none_vector) : none_vector_(none_vector) {}
 
 private:
   VectorView(const VectorView &) = default;
-  VectorView(bool none_vector) : none_vector_(none_vector) {}
 
   igraph_vector_t vector_;
   bool none_vector_ = false;
@@ -200,6 +200,9 @@ public:
 
 private:
   explicit Vector(const igraph_vector_t &vector);
+
+  void disown() { VECTOR(*ptr()) = NULL; }
+  bool owner() const { return VECTOR(*ptr()) != NULL; }
 };
 
 } // namespace igraph
