@@ -33,7 +33,7 @@ struct PageRank {
 };
 
 class Graph {
-public:
+ public:
   /* Constructors and Destructors */
   ~Graph();
   Graph(long int vertices = 0, Directedness dir = Undirected);
@@ -144,12 +144,12 @@ public:
                              Loops loops = NoLoops, bool multiple = false);
   // Rewire uniformly
   void rewire_edges(double prob, Loops loops = NoLoops, bool multiple = false);
-  static Graph
-  DegreeSequence(const VectorView &degrees,
-                 DegreeSequenceMethod method = DegreeSequenceSimple);
-  static Graph
-  DegreeSequence(const VectorView &out_deq, const VectorView &in_deq,
-                 DegreeSequenceMethod method = DegreeSequenceSimple);
+  static Graph DegreeSequence(
+      const VectorView &degrees,
+      DegreeSequenceMethod method = DegreeSequenceSimple);
+  static Graph DegreeSequence(
+      const VectorView &out_deq, const VectorView &in_deq,
+      DegreeSequenceMethod method = DegreeSequenceSimple);
   static Graph kRegular(int vertices, int k, Directedness dir = Directed,
                         bool multiple = false);
   static Graph StaticFitness(int vertices, const VectorView &fitness,
@@ -327,11 +327,10 @@ public:
   int maxdegree(const VertexSelector &vids = VertexSelector::All(),
                 NeighborMode mode = Out, Loops loops = NoLoops) const;
   Vector strength(const VertexSelector &vids = VertexSelector::All(),
-                NeighborMode mode = Out, Loops loops = NoLoops,
-                const VectorView &weights = VectorView::None()) const;
-  double strength(int vertex,
-                NeighborMode mode = Out, Loops loops = NoLoops,
-                const VectorView &weights = VectorView::None()) const;
+                  NeighborMode mode = Out, Loops loops = NoLoops,
+                  const VectorView &weights = VectorView::None()) const;
+  double strength(int vertex, NeighborMode mode = Out, Loops loops = NoLoops,
+                  const VectorView &weights = VectorView::None()) const;
   // igraph_eigenvector_centrality
   // igraph_hub_score
   // igraph_authority_score
@@ -500,6 +499,10 @@ public:
   // Skipped igraph_layout_merge_dla
 
   /* Reading and Writing Graphs from and to Files */
+  static Graph ReadEdgelist(FILE *instream, int n = 0,
+                            Directedness dir = Undirected);
+  static Graph ReadEdgelist(std::string filename, int n = 0,
+                            Directedness dir = Undirected);
   // igraph_read_graph_edgelist
   // igraph_write_graph_edgelist
   // Skipped igraph_read_graph_ncol
@@ -588,10 +591,10 @@ public:
     disown();
   }
 
-protected:
+ protected:
   Graph(const igraph_t &graph);
 
-private:
+ private:
   void disown() { owner_ = false; }
   bool owner() const { return owner_; }
 
@@ -599,6 +602,6 @@ private:
   bool owner_ = true;
 };
 
-} // namespace igraph
+}  // namespace igraph
 
-#endif // IGRAPHPP_GRAPH_HPP_
+#endif  // IGRAPHPP_GRAPH_HPP_

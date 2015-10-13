@@ -1,5 +1,6 @@
 
 #include <cmath>
+#include <cstdio>
 
 #include <catch.hpp>
 
@@ -390,4 +391,20 @@ TEST_CASE("Graph — centrality measures", "[Graph]") {
   CHECK(g.maxdegree() == 9);
   CHECK(g.strength(0) == 9);
   // WARN("" << g.strength(0));
+}
+
+TEST_CASE("Graph — Reading and Writing Graphs from and to Files", "[Graph]") {
+  using igraph::Graph;
+  FILE *fp = fopen("./test/edgelist.txt", "r");
+  REQUIRE(fp != NULL);
+  Graph g = Graph::ReadEdgelist(fp);
+  CHECK_FALSE(g.is_directed());
+  CHECK(g.vcount() == 5);
+  CHECK(g.ecount() == 4);
+  fclose(fp);
+
+  Graph g2 = Graph::ReadEdgelist("./test/edgelist.txt");
+  CHECK_FALSE(g2.is_directed());
+  CHECK(g2.vcount() == 5);
+  CHECK(g2.ecount() == 4);
 }

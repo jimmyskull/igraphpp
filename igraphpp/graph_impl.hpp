@@ -9,6 +9,7 @@
 #include <cstring>
 #endif
 
+#include <stdexcept>
 #include <utility>
 
 #include <igraph.h>
@@ -18,8 +19,7 @@
 namespace igraph {
 
 inline Graph::~Graph() {
-  if (owner())
-    SafeCall(igraph_destroy(ptr()));
+  if (owner()) SafeCall(igraph_destroy(ptr()));
 }
 inline Graph::Graph(long int vertices, Directedness dir) {
   SafeCall(igraph_empty(ptr(), vertices, dir));
@@ -48,16 +48,13 @@ inline Graph::Graph(Graph &&other) {
 }
 
 inline Graph &Graph::operator=(const Graph &other) {
-  if (this == &other)
-    return *this;
-  if (owner())
-    SafeCall(igraph_destroy(&graph_));
+  if (this == &other) return *this;
+  if (owner()) SafeCall(igraph_destroy(&graph_));
   SafeCall(igraph_copy(&graph_, &other.graph_));
   return *this;
 }
 inline Graph &Graph::operator=(Graph &&other) {
-  if (owner())
-    SafeCall(igraph_destroy(&graph_));
+  if (owner()) SafeCall(igraph_destroy(&graph_));
   *ptr() = *other.ptr();
   other.disown();
   return *this;
@@ -522,7 +519,8 @@ inline Matrix Graph::shortest_paths(const VertexSelector &from,
 }
 inline double Graph::shortest_paths(int from, int to, NeighborMode mode) const {
   return shortest_paths(VertexSelector::Single(from),
-                        VertexSelector::Single(to), mode).at(0, 0);
+                        VertexSelector::Single(to), mode)
+      .at(0, 0);
 }
 inline Matrix Graph::shortest_paths_dijkstra(const VertexSelector &from,
                                              const VertexSelector &to,
@@ -538,8 +536,8 @@ inline double Graph::shortest_paths_dijkstra(int from, int to,
                                              const VectorView &weights,
                                              NeighborMode mode) const {
   return shortest_paths_dijkstra(VertexSelector::Single(from),
-                                 VertexSelector::Single(to), weights,
-                                 mode).at(0, 0);
+                                 VertexSelector::Single(to), weights, mode)
+      .at(0, 0);
 }
 inline Matrix Graph::shortest_paths_bellman_ford(const VertexSelector &from,
                                                  const VertexSelector &to,
@@ -555,8 +553,8 @@ inline double Graph::shortest_paths_bellman_ford(int from, int to,
                                                  const VectorView &weights,
                                                  NeighborMode mode) const {
   return shortest_paths_bellman_ford(VertexSelector::Single(from),
-                                     VertexSelector::Single(to), weights,
-                                     mode).at(0, 0);
+                                     VertexSelector::Single(to), weights, mode)
+      .at(0, 0);
 }
 inline Matrix Graph::shortest_paths_johnson(const VertexSelector &from,
                                             const VertexSelector &to,
@@ -569,7 +567,8 @@ inline Matrix Graph::shortest_paths_johnson(const VertexSelector &from,
 inline double Graph::shortest_paths_johnson(int from, int to,
                                             const VectorView &weights) const {
   return shortest_paths_johnson(VertexSelector::Single(from),
-                                VertexSelector::Single(to), weights).at(0, 0);
+                                VertexSelector::Single(to), weights)
+      .at(0, 0);
 }
 // Skipped igraph_get_shortest_paths
 // Skipped igraph_get_shortest_path
@@ -667,9 +666,8 @@ inline Vector Graph::subcomponent(int vertex, NeighborMode mode) const {
                                static_cast<igraph_neimode_t>(mode)));
   return result;
 }
-inline Graph
-Graph::induced_subgraph(const VertexSelector &vids,
-                        SubgraphImplementation implementation) const {
+inline Graph Graph::induced_subgraph(
+    const VertexSelector &vids, SubgraphImplementation implementation) const {
   igraph_t graph;
   SafeCall(igraph_induced_subgraph(
       ptr(), &graph, vids.vs(),
@@ -775,25 +773,39 @@ inline int Graph::maxdegree(const VertexSelector &vids, NeighborMode mode,
                             Loops loops) const {
   int result;
   SafeCall(igraph_maxdegree(ptr(), &result, vids.vs(),
-    static_cast<igraph_neimode_t>(mode), loops));
+                            static_cast<igraph_neimode_t>(mode), loops));
   return result;
 }
-inline  Vector Graph::strength(const VertexSelector &vids ,
-                NeighborMode mode , Loops loops ,
-                const VectorView &weights ) const {
+inline Vector Graph::strength(const VertexSelector &vids, NeighborMode mode,
+                              Loops loops, const VectorView &weights) const {
   Vector result;
   SafeCall(igraph_strength(ptr(), result.ptr(), vids.vs(),
-    static_cast<igraph_neimode_t>(mode), loops, weights.ptr()));
+                           static_cast<igraph_neimode_t>(mode), loops,
+                           weights.ptr()));
   return result;
 }
-inline  double Graph::strength(int vertex,
-                NeighborMode mode , Loops loops ,
-                const VectorView &weights ) const {
+inline double Graph::strength(int vertex, NeighborMode mode, Loops loops,
+                              const VectorView &weights) const {
   return strength(VertexSelector::Single(vertex), mode, loops, weights).at(0);
 }
 
+inline Graph Graph::ReadEdgelist(FILE *instream, int n, Directedness dir) {
+  igraph_t graph;
+  SafeCall(igraph_read_graph_edgelist(&graph, instream, n, dir));
+  return Graph(graph);
+}
+inline Graph Graph::ReadEdgelist(std::string filename, int n, Directedness dir) {
+  FILE *fp = fopen(filename.c_str(), "r");
+  if (fp == NULL)
+    throw std::runtime_error("File not found");
+  Graph graph = ReadEdgelist(fp, n, dir);
+  fclose(fp);
+  return graph;
+}
+
+
 inline Graph::Graph(const igraph_t &graph) : graph_(graph) {}
 
-} // namespace igraph
+}  // namespace igraph
 
-#endif // IGRAPHPP_GRAPH_IMPL_HPP_
+#endif  // IGRAPHPP_GRAPH_IMPL_HPP_
