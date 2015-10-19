@@ -789,20 +789,42 @@ inline double Graph::strength(int vertex, NeighborMode mode, Loops loops,
   return strength(VertexSelector::Single(vertex), mode, loops, weights).at(0);
 }
 
+/* Directedness conversion */
+inline Graph &Graph::to_directed(DirectedMode mode) {
+  SafeCall(igraph_to_directed(ptr(), static_cast<igraph_to_directed_t>(mode)));
+  return *this;
+}
+inline Graph &Graph::to_undirected(UndirectedMode mode) {
+  SafeCall(igraph_to_undirected(
+      ptr(), static_cast<igraph_to_undirected_t>(mode), NULL));
+  return *this;
+}
+
 inline Graph Graph::ReadEdgelist(FILE *instream, int n, Directedness dir) {
   igraph_t graph;
   SafeCall(igraph_read_graph_edgelist(&graph, instream, n, dir));
   return Graph(graph);
 }
-inline Graph Graph::ReadEdgelist(std::string filename, int n, Directedness dir) {
+inline Graph Graph::ReadEdgelist(std::string filename, int n,
+                                 Directedness dir) {
   FILE *fp = fopen(filename.c_str(), "r");
-  if (fp == NULL)
-    throw std::runtime_error("File not found");
+  if (fp == NULL) throw std::runtime_error("File not found");
   Graph graph = ReadEdgelist(fp, n, dir);
   fclose(fp);
   return graph;
 }
-
+inline Graph Graph::ReadPajek(FILE *instream) {
+  igraph_t graph;
+  SafeCall(igraph_read_graph_pajek(&graph, instream));
+  return Graph(graph);
+}
+inline Graph Graph::ReadPajek(std::string filename) {
+  FILE *fp = fopen(filename.c_str(), "r");
+  if (fp == NULL) throw std::runtime_error("File not found");
+  Graph graph = ReadPajek(fp);
+  fclose(fp);
+  return graph;
+}
 
 inline Graph::Graph(const igraph_t &graph) : graph_(graph) {}
 

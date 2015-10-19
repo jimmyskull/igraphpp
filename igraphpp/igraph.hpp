@@ -84,6 +84,18 @@ enum SubgraphImplementation {
   SubgraphCreateFromScratch = IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH
 };
 
+enum DirectedMode {
+  DirectedArbitrary = IGRAPH_TO_DIRECTED_ARBITRARY,
+  DirectedMutual = IGRAPH_TO_DIRECTED_MUTUAL
+};
+
+enum UndirectedMode {
+  UndirectedEach = IGRAPH_TO_UNDIRECTED_EACH,
+  UndirectedCollapse = IGRAPH_TO_UNDIRECTED_COLLAPSE,
+  UndirectedMutual = IGRAPH_TO_UNDIRECTED_MUTUAL
+};
+
+
 static inline int SetSeed(unsigned long int seed) {
   igraph_rng_t *rng = igraph_rng_default();
   int ret = igraph_rng_seed(rng, seed);

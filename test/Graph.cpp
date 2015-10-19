@@ -371,8 +371,7 @@ TEST_CASE("Graph — centrality measures", "[Graph]") {
   Graph g = Graph::Star(10);
   Vector closeness = g.closeness(VertexSelector::All());
   CHECK(closeness[0] == Approx(0.111111));
-  for (int i = 1; i < 10; ++i)
-    CHECK(closeness[i] == Approx(0.0111111));
+  for (int i = 1; i < 10; ++i) CHECK(closeness[i] == Approx(0.0111111));
   CHECK(g.closeness(0, igraph::Out, Vector(1, g.ecount())) ==
         Approx(0.0222222222));
 
@@ -407,4 +406,9 @@ TEST_CASE("Graph — Reading and Writing Graphs from and to Files", "[Graph]") {
   CHECK_FALSE(g2.is_directed());
   CHECK(g2.vcount() == 5);
   CHECK(g2.ecount() == 4);
+
+  Graph g3 = Graph::ReadPajek("./test/pajek.net").to_undirected();
+  CHECK_FALSE(g3.is_directed());
+  CHECK(g3.vcount() == 5);
+  CHECK(g3.ecount() == 4);
 }

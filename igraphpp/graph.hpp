@@ -374,8 +374,8 @@ class Graph {
   // igraph_transitivity_barrat
 
   /* Directedness conversion */
-  // igraph_to_directed
-  // igraph_to_undirected
+  Graph &to_directed(DirectedMode mode = DirectedMutual);
+  Graph &to_undirected(UndirectedMode mode = UndirectedCollapse);
 
   /* Spectral properties */
   // igraph_laplacian
@@ -516,8 +516,8 @@ class Graph {
   // igraph_write_graph_graphml
   // igraph_read_graph_gml
   // igraph_write_graph_gml
-  // igraph_read_graph_pajek
-  // igraph_write_graph_pajek
+  static Graph ReadPajek(FILE *instream);
+  static Graph ReadPajek(std::string filename);
   // igraph_read_graph_dl
   // igraph_write_graph_dot
 
