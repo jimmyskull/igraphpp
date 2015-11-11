@@ -9,20 +9,33 @@
 ## -----------------------------------------------------------------------------
 ## Check for the header files
 
+set(CMAKE_EXTRA_INCLUDES "$ENV{HOME}/.local/include")
+
 find_path (IGRAPH_INCLUDES igraph.h
-  PATHS ${CMAKE_EXTRA_INCLUDES} PATH_SUFFIXES igraph/ igraph/include NO_DEFAULT_PATH
-  )
+  HINTS ${CMAKE_EXTRA_INCLUDES}
+  PATHS ${CMAKE_EXTRA_INCLUDES}
+  PATH_SUFFIXES igraph/ igraph/include
+  NO_DEFAULT_PATH
+)
+
 if(NOT IGRAPH_INCLUDES)
-    find_path (IGRAPH_INCLUDES igraph.h
-      PATHS /usr/local/include /usr/include /include /sw/include /usr/lib /usr/lib64 /usr/lib/x86_64-linux-gnu/ ${CMAKE_EXTRA_INCLUDES} PATH_SUFFIXES igraph/ igraph/include
-      )
+ find_path (IGRAPH_INCLUDES igraph.h
+    HINTS ${CMAKE_EXTRA_INCLUDES}
+    PATHS ${CMAKE_EXTRA_INCLUDES} /usr/local/include /usr/include /include
+          /sw/include /usr/lib /usr/lib64 /usr/lib/x86_64-linux-gnu/
+    PATH_SUFFIXES igraph/ igraph/include
+    NO_DEFAULT_PATH
+ )
 endif(NOT IGRAPH_INCLUDES)
 
 ## -----------------------------------------------------------------------------
 ## Check for the library
 
 find_library (IGRAPH_LIBRARIES NAMES igraph
-  PATHS ${CMAKE_EXTRA_LIBRARIES} PATH_SUFFIXES igraph/ NO_DEFAULT_PATH
+  HINTS ${CMAKE_EXTRA_INCLUDES}
+  PATHS ${CMAKE_EXTRA_LIBRARIES}
+  PATH_SUFFIXES igraph/
+  NO_DEFAULT_PATH
   )
 if(NOT IGRAPH_LIBRARIES)
     find_library (IGRAPH_LIBRARIES NAMES igraph
