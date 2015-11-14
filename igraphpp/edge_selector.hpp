@@ -40,8 +40,8 @@ class EdgeSelector {
   static EdgeSelector Sequence(int from, int to);
   static EdgeSelector Pairs(const Vector &edge_vector,
                             Directedness dir = Directed);
-  template <typename... Args, typename = std::enable_if_t<util::all_args(
-                                  std::is_same<Args, int>::value...)>>
+  template <typename... Args, typename = typename std::enable_if<util::all_args(
+                                  std::is_same<Args, int>::value...)>::type>
   static EdgeSelector Pairs(Directedness dir, Args... args);
 
   const igraph_es_t &es() const { return es_; }

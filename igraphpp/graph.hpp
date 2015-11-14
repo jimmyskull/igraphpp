@@ -112,8 +112,8 @@ class Graph {
                     Loops loops = NoLoops);
   static Graph FullCitation(int vertices, Directedness dir = Directed);
   static Graph Famous(const char *name);
-  template <typename... Args, typename = std::enable_if_t<util::all_args(
-                                  std::is_same<Args, int>::value...)>>
+  template <typename... Args, typename = typename std::enable_if<util::all_args(
+                                  std::is_same<Args, int>::value...)>::type>
   static Graph LCF(int vertices, Args... args);
   static Graph LCF(int vertices, const VectorView &shifts, int repeats);
   static Graph LCF(int vertices, std::initializer_list<double> shifts,

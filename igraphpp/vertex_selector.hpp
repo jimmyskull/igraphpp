@@ -38,8 +38,8 @@ class VertexSelector {
   // VectorView will not copy the contents of |vector|.
   static VertexSelector FromVector(const VectorView &vector);
   static VertexSelector Sequence(int from, int to);
-  template <typename... Args, typename = std::enable_if_t<util::all_args(
-                                  std::is_same<Args, int>::value...)>>
+  template <typename... Args, typename = typename std::enable_if<util::all_args(
+                                  std::is_same<Args, int>::value...)>::type>
   static VertexSelector Small(Args... args);
 
   const igraph_vs_t &vs() const { return vs_; }
