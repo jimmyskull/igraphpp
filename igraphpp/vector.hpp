@@ -18,7 +18,7 @@ namespace igraph {
 class Vector;
 
 class VectorView {
-public:
+ public:
   /* Constructors and Destructors */
   ~VectorView();
   VectorView(const double *data, long int length);
@@ -90,7 +90,7 @@ public:
   igraph_vector_t *ptr() { return is_none() ? NULL : &vector_; }
 
   class iterator : public std::iterator<std::forward_iterator_tag, double> {
-  public:
+   public:
     iterator(igraph_vector_t *vec, long int pos) : vec_(vec), pos_(pos) {}
     iterator(const iterator &itr) : vec_(itr.vec_), pos_(itr.pos_) {}
     iterator &operator++() {
@@ -101,14 +101,14 @@ public:
     bool operator!=(const iterator &rhs) const { return pos_ != rhs.pos_; }
     double &operator*() { return VECTOR(*vec_)[pos_]; }
 
-  private:
+   private:
     igraph_vector_t *vec_;
     long int pos_;
   };
 
   class const_iterator
       : public std::iterator<std::forward_iterator_tag, double> {
-  public:
+   public:
     const_iterator(const igraph_vector_t *vec, long int pos)
         : vec_(vec), pos_(pos) {}
     const_iterator(const const_iterator &itr)
@@ -121,7 +121,7 @@ public:
     bool operator!=(const const_iterator &rhs) { return pos_ != rhs.pos_; }
     double operator*() const { return VECTOR(*vec_)[pos_]; }
 
-  private:
+   private:
     const igraph_vector_t *vec_;
     long int pos_;
   };
@@ -138,11 +138,11 @@ public:
   }
   bool is_none() const { return none_vector_; }
 
-protected:
+ protected:
   VectorView() = default;
   VectorView(bool none_vector) : none_vector_(none_vector) {}
 
-private:
+ private:
   VectorView(const VectorView &) = default;
 
   igraph_vector_t vector_;
@@ -150,7 +150,7 @@ private:
 };
 
 class Vector : public VectorView {
-public:
+ public:
   /* Constructors and Destructors */
   ~Vector();
   explicit Vector(long int size = 0);
@@ -198,13 +198,22 @@ public:
 
   static Vector Repeat(double value, long int times);
 
-private:
+ private:
   explicit Vector(const igraph_vector_t &vector);
 
   void disown() { VECTOR(*ptr()) = NULL; }
   bool owner() const { return VECTOR(*ptr()) != NULL; }
 };
 
-} // namespace igraph
+template <typename Iterator, typename>
+Vector::Vector(Iterator begin, Iterator end)
+    : VectorView() {
+  SafeCall(igraph_vector_init(ptr(), 0));
+  for (; begin != end; ++begin) {
+    push_back(static_cast<double>(*begin));
+  }
+}
 
-#endif // IGRAPHPP_VECTOR_HPP_
+}  // namespace igraph
+
+#endif  // IGRAPHPP_VECTOR_HPP_

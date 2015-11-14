@@ -18,7 +18,7 @@ class Graph;
 class Vector;
 
 class EdgeSelector {
-public:
+ public:
   ~EdgeSelector();
   EdgeSelector(const EdgeSelector &es);
   EdgeSelector(std::initializer_list<double> list);
@@ -48,13 +48,26 @@ public:
   igraph_es_t *ptr() { return &es_; }
   const igraph_es_t *ptr() const { return &es_; }
 
-protected:
+ protected:
   EdgeSelector(const igraph_es_t &es);
 
-private:
+ private:
   igraph_es_t es_;
 };
 
-} // namespace igraph
+template <typename Iterator, typename>
+EdgeSelector::EdgeSelector(Iterator begin, Iterator end) {
+  Vector vector(begin, end);
+  SafeCall(igraph_es_vector_copy(ptr(), vector.ptr()));
+}
 
-#endif // IGRAPHPP_EDGE_SELECTOR_HPP_
+template <typename... Args, typename>
+EdgeSelector EdgeSelector::Pairs(Directedness dir, Args... args) {
+  igraph_es_t es;
+  SafeCall(igraph_es_pairs_small(&es, dir, args..., -1));
+  return EdgeSelector(es);
+}
+
+}  // namespace igraph
+
+#endif  // IGRAPHPP_EDGE_SELECTOR_HPP_

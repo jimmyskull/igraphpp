@@ -602,6 +602,20 @@ class Graph {
   bool owner_ = true;
 };
 
+template <typename Iterator, typename>
+Graph::Graph(Iterator edges_begin, Iterator edges_end, long int vertices,
+             Directedness dir) {
+  Vector vector(edges_begin, edges_end);
+  SafeCall(igraph_create(ptr(), vector.ptr(), vertices, dir));
+}
+
+template <typename... Args, typename>
+Graph Graph::LCF(int vertices, Args... args) {
+  igraph_t graph;
+  SafeCall(igraph_lcf(&graph, vertices, args..., 0));
+  return Graph(graph);
+}
+
 }  // namespace igraph
 
 #endif  // IGRAPHPP_GRAPH_HPP_

@@ -16,7 +16,7 @@ namespace igraph {
 class Graph;
 
 class VertexSelector {
-public:
+ public:
   ~VertexSelector();
   VertexSelector(const VertexSelector &vs);
   VertexSelector(std::initializer_list<double> list);
@@ -46,12 +46,25 @@ public:
   igraph_vs_t *ptr() { return &vs_; }
   const igraph_vs_t *ptr() const { return &vs_; }
 
-private:
+ private:
   VertexSelector(const igraph_vs_t &vs);
 
   igraph_vs_t vs_;
 };
 
-} // namespace igraph
+template <typename Iterator, typename>
+VertexSelector::VertexSelector(Iterator begin, Iterator end) {
+  Vector vector(begin, end);
+  SafeCall(igraph_vs_vector_copy(ptr(), vector.ptr()));
+}
 
-#endif // IGRAPHPP_VERTEX_SELECTOR_HPP_
+template <typename... Args, typename>
+VertexSelector VertexSelector::Small(Args... args) {
+  igraph_vs_t vs;
+  SafeCall(igraph_vs_vector_small(&vs, args..., -1));
+  return VertexSelector(vs);
+}
+
+}  // namespace igraph
+
+#endif  // IGRAPHPP_VERTEX_SELECTOR_HPP_

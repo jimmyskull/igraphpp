@@ -1,4 +1,3 @@
-
 find_package(Catch REQUIRED)
 include_directories(${CATCH_INCLUDE_DIR})
 
@@ -14,4 +13,4 @@ add_executable(test_suite
   Matrix.cpp
   Graph.cpp)
 
-target_link_libraries(test_suite ${IGRAPH_LIBRARIES})
+target_link_libraries(test_suite ${IGRAPH_LIBRARIES} igraphpp)
