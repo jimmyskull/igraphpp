@@ -3,7 +3,9 @@ project(IGraphWrapper C CXX)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMakeModules)
 
-find_package(IGRAPH REQUIRED)
+if (NOT FOUND_IGRAPH)
+  find_package(IGRAPH REQUIRED)
+endif (NOT FOUND_IGRAPH)
 
 include_directories(${IGRAPH_INCLUDES})
 include_directories(${PROJECT_SOURCE_DIR})
