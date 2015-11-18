@@ -10,8 +10,9 @@
 #endif
 
 #include <initializer_list>
+#include <string>
 
-#include <igraph.h>
+#include <igraph/igraph.h>
 
 #include "./exception.hpp"
 #include "./mapper.hpp"

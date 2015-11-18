@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 
-#include <igraph.h>
+#include <igraph/igraph.h>
 
 namespace igraph {
 

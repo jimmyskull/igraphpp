@@ -7,7 +7,7 @@
 
 #include <type_traits>
 
-#include <igraph.h>
+#include <igraph/igraph.h>
 
 #include "./util.hpp"
 

@@ -9,7 +9,7 @@
 #include <iterator>
 #include <type_traits>
 
-#include <igraph.h>
+#include <igraph/igraph.h>
 
 #include "./exception.hpp"
 #include "./mapper.hpp"

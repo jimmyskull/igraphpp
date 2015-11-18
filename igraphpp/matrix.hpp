@@ -7,7 +7,7 @@
 
 #include <initializer_list>
 
-#include <igraph.h>
+#include <igraph/igraph.h>
 
 #include "./mapper.hpp"
 #include "./util.hpp"

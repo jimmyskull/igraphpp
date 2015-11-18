@@ -7,7 +7,7 @@
 
 #include <iterator>
 
-#include <igraph.h>
+#include <igraph/igraph.h>
 
 #include "./exception.hpp"
 

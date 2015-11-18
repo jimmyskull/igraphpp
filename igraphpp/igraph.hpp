@@ -3,7 +3,7 @@
 
 #include <utility>
 
-#include <igraph.h>
+#include <igraph/igraph.h>
 
 #include "./exception.hpp"
 

@@ -5,7 +5,7 @@
 #error "You must include igraph.hpp first"
 #endif
 
-#include <igraph.h>
+#include <igraph/igraph.h>
 
 namespace igraph {
 
