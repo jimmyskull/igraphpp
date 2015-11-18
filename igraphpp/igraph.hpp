@@ -95,7 +95,6 @@ enum UndirectedMode {
   UndirectedMutual = IGRAPH_TO_UNDIRECTED_MUTUAL
 };
 
-
 static inline int SetSeed(unsigned long int seed) {
   igraph_rng_t *rng = igraph_rng_default();
   int ret = igraph_rng_seed(rng, seed);
@@ -104,12 +103,13 @@ static inline int SetSeed(unsigned long int seed) {
 
 } // namespace igraph
 
+#include "./mapper.hpp"
 #include "./vector.hpp"
+#include "./vectorptr.hpp"
 #include "./vertex_selector.hpp"
 #include "./vertex_iterator.hpp"
 #include "./edge_selector.hpp"
 #include "./edge_iterator.hpp"
-#include "./vectorptr.hpp"
 #include "./matrix.hpp"
 #include "./graph.hpp"
 

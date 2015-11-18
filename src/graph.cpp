@@ -35,13 +35,13 @@ Graph::Graph(Graph &&other) {
   other.disown();
 }
 
-Graph &Graph::operator=(const Graph &other) {
+Graph &Graph::operator=(const Graph &other) & {
   if (this == &other) return *this;
   if (owner()) SafeCall(igraph_destroy(&graph_));
   SafeCall(igraph_copy(&graph_, &other.graph_));
   return *this;
 }
-Graph &Graph::operator=(Graph &&other) {
+Graph &Graph::operator=(Graph &&other) & {
   if (owner()) SafeCall(igraph_destroy(&graph_));
   *ptr() = *other.ptr();
   other.disown();
@@ -783,6 +783,7 @@ Graph Graph::ReadPajek(std::string filename) {
   return graph;
 }
 
-Graph::Graph(const igraph_t &graph) : graph_(graph) {}
+Graph::Graph(const igraph_t &graph, bool owner)
+    : graph_(graph), owner_(owner) {}
 
 }  // namespace igraph

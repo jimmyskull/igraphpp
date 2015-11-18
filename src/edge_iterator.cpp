@@ -44,4 +44,4 @@ EdgeIterator EdgeIterator::end() const {
 
 EdgeIterator::EdgeIterator(const igraph_eit_t &eit) : eit_(eit) {}
 
-}  // namespace igraph
+} // namespace igraph

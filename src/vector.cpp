@@ -130,13 +130,15 @@ bool VectorView::contains(double value) const noexcept {
 long int VectorView::search(double value, long int from) const noexcept {
   long int result;
   bool contains = igraph_vector_search(ptr(), from, value, &result);
-  if (contains) return result;
+  if (contains)
+    return result;
   return -1;
 }
 long int VectorView::binsearch(double value) const noexcept {
   long int result;
   bool contains = igraph_vector_binsearch(ptr(), value, &result);
-  if (contains) return result;
+  if (contains)
+    return result;
   return -1;
 }
 
@@ -144,7 +146,8 @@ long int VectorView::binsearch(double value) const noexcept {
 void VectorView::sort() noexcept { igraph_vector_sort(ptr()); }
 
 Vector::~Vector() {
-  if (VECTOR(*ptr()) != NULL) igraph_vector_destroy(ptr());
+  if (VECTOR(*ptr()) != NULL)
+    igraph_vector_destroy(ptr());
 }
 Vector::Vector(long int size) : VectorView() {
   SafeCall(igraph_vector_init(ptr(), size));
@@ -168,14 +171,16 @@ Vector::Vector(std::initializer_list<double> list) {
 Vector::Vector(const Vector &other)
     : Vector(static_cast<const VectorView &>(other)) {}
 Vector::Vector(const VectorView &other) : VectorView(other.is_none()) {
-  if (!other.is_none()) SafeCall(igraph_vector_copy(ptr(), other.ptr()));
+  if (!other.is_none())
+    SafeCall(igraph_vector_copy(ptr(), other.ptr()));
 }
 Vector::Vector(Vector &&other) : VectorView(other.is_none()) {
   *ptr() = *other.ptr();
   other.disown();
 }
-Vector &Vector::operator=(Vector &&other) {
-  if (owner()) igraph_vector_destroy(ptr());
+Vector &Vector::operator=(Vector &&other) & {
+  if (owner())
+    igraph_vector_destroy(ptr());
   *ptr() = *other.ptr();
   other.disown();
   return *this;
@@ -220,15 +225,19 @@ Vector Vector::operator/(const VectorView &b) const {
 }
 
 /* Copying vectors */
-Vector &Vector::operator=(const VectorView &other) {
-  if (this == &other) return *this;
-  if (owner() && !is_none()) this->~Vector();
+Vector &Vector::operator=(const VectorView &other) & {
+  if (this == &other)
+    return *this;
+  if (owner() && !is_none())
+    this->~Vector();
   SafeCall(igraph_vector_copy(ptr(), other.ptr()));
   return *this;
 }
-Vector &Vector::operator=(const Vector &other) {
-  if (this == &other) return *this;
-  if (owner() && !is_none()) this->~Vector();
+Vector &Vector::operator=(const Vector &other) & {
+  if (this == &other)
+    return *this;
+  if (owner() && !is_none())
+    this->~Vector();
   SafeCall(igraph_vector_copy(ptr(), other.ptr()));
   return *this;
 }
@@ -282,4 +291,4 @@ Vector::Vector(const igraph_vector_t &vector) : VectorView() {
   SafeCall(igraph_vector_copy(ptr(), &vector));
 }
 
-}  // namespace igraph
+} // namespace igraph

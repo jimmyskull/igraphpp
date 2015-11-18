@@ -11,6 +11,7 @@
 #include <igraph.h>
 
 #include "./exception.hpp"
+#include "./mapper.hpp"
 #include "./util.hpp"
 
 namespace igraph {
@@ -18,10 +19,14 @@ namespace igraph {
 class Vector;
 
 class VectorView {
+  template <typename>
+  friend struct TypeMapper;
+
  public:
   /* Constructors and Destructors */
   ~VectorView();
   VectorView(const double *data, long int length);
+  VectorView(VectorView &&) = default;
   VectorView &operator=(VectorView &other) = delete;
   VectorView &operator=(VectorView &&other) = delete;
 
@@ -140,7 +145,8 @@ class VectorView {
 
  protected:
   VectorView() = default;
-  VectorView(bool none_vector) : none_vector_(none_vector) {}
+  explicit VectorView(bool none_vector) : none_vector_(none_vector) {}
+  VectorView(const igraph_vector_t &vector) : vector_(vector){};
 
  private:
   VectorView(const VectorView &) = default;
@@ -150,6 +156,9 @@ class VectorView {
 };
 
 class Vector : public VectorView {
+  template <typename>
+  friend struct TypeMapper;
+
  public:
   /* Constructors and Destructors */
   ~Vector();
@@ -163,7 +172,7 @@ class Vector : public VectorView {
   Vector(const Vector &other);
   Vector(const VectorView &other);
   Vector(Vector &&other);
-  Vector &operator=(Vector &&other);
+  Vector &operator=(Vector &&other)&;
 
   /* Vector operations */
   Vector operator+(double scalar) const noexcept;
@@ -176,8 +185,8 @@ class Vector : public VectorView {
   Vector operator/(const VectorView &b) const;
 
   /* Copying vectors */
-  Vector &operator=(const VectorView &other);
-  Vector &operator=(const Vector &other);
+  Vector &operator=(const VectorView &other)&;
+  Vector &operator=(const Vector &other)&;
   void append(const VectorView &other);
   void update(const VectorView &other) noexcept;
 
@@ -198,11 +207,26 @@ class Vector : public VectorView {
 
   static Vector Repeat(double value, long int times);
 
- private:
+ protected:
   explicit Vector(const igraph_vector_t &vector);
 
+ private:
   void disown() { VECTOR(*ptr()) = NULL; }
   bool owner() const { return VECTOR(*ptr()) != NULL; }
+};
+
+template <>
+struct TypeMapper<VectorView> {
+  typedef igraph_vector_t type;
+
+  static VectorView Build(const type &vector) { return VectorView(vector); }
+};
+
+template <>
+struct TypeMapper<Vector> {
+  typedef igraph_vector_t type;
+
+  static Vector Build(const type &vector) { return Vector(vector); }
 };
 
 template <typename Iterator, typename>

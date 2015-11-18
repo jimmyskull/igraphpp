@@ -44,4 +44,4 @@ VertexIterator VertexIterator::end() const {
 
 VertexIterator::VertexIterator(const igraph_vit_t &vit) : vit_(vit) {}
 
-}  // namespace igraph
+} // namespace igraph

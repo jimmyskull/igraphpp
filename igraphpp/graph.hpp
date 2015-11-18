@@ -14,6 +14,8 @@
 #include <igraph.h>
 
 #include "./exception.hpp"
+#include "./mapper.hpp"
+#include "./vector.hpp"
 #include "./util.hpp"
 
 namespace igraph {
@@ -33,6 +35,9 @@ struct PageRank {
 };
 
 class Graph {
+  template <typename>
+  friend struct TypeMapper;
+
  public:
   /* Constructors and Destructors */
   ~Graph();
@@ -49,8 +54,8 @@ class Graph {
   Graph(const Graph &other);
   Graph(Graph &&other);
 
-  Graph &operator=(const Graph &other);
-  Graph &operator=(Graph &&other);
+  Graph &operator=(const Graph &other)&;
+  Graph &operator=(Graph &&other)&;
 
   /* Basic query operations */
   int vcount() const noexcept;
@@ -592,7 +597,7 @@ class Graph {
   }
 
  protected:
-  Graph(const igraph_t &graph);
+  Graph(const igraph_t &graph, bool owner = true);
 
  private:
   void disown() { owner_ = false; }
@@ -600,6 +605,17 @@ class Graph {
 
   igraph_t graph_;
   bool owner_ = true;
+};
+
+template <>
+struct TypeMapper<Graph> {
+  typedef igraph_t type;
+
+  static Graph Build(const type &graph, bool owner = false) {
+    Graph g = Graph(graph);
+    if (!owner) g.disown();
+    return g;
+  }
 };
 
 template <typename Iterator, typename>

@@ -16,7 +16,7 @@ namespace igraph {
 class Vector;
 
 class Matrix {
- public:
+public:
   /* Constructors and destructors */
   ~Matrix();
   Matrix(long int nrow = 0, long int ncol = 0);
@@ -27,15 +27,15 @@ class Matrix {
   Matrix(Iterator begin, Iterator end, long int nrow, long int ncol);
   Matrix(const Matrix &matrix);
   Matrix(Matrix &&matrix);
-  Matrix &operator=(const Matrix &matrix);
-  Matrix &operator=(Matrix &&matrix);
+  Matrix &operator=(const Matrix &matrix)&;
+  Matrix &operator=(Matrix &&matrix)&;
 
   /* Initializing elements */
   void null() noexcept;
   void fill(double value) noexcept;
 
   /* Copying matrices */
-  void copy_to(double *to) noexcept;  // Column major
+  void copy_to(double *to) noexcept; // Column major
   void update(const Matrix &from);
   void swap(Matrix &m2);
 
@@ -115,7 +115,7 @@ class Matrix {
   igraph_matrix_t *ptr() { return &matrix_; }
   const igraph_matrix_t *ptr() const { return &matrix_; }
 
- private:
+private:
   void disown() { ptr()->ncol = -1; }
   bool owner() const { return ptr()->ncol != -1; }
 
@@ -136,6 +136,6 @@ Matrix::Matrix(Iterator begin, Iterator end, long int nrow, long int ncol)
   }
 }
 
-}  // namespace igraph
+} // namespace igraph
 
-#endif  // IGRAPHPP_MATRIX_HPP_
+#endif // IGRAPHPP_MATRIX_HPP_

@@ -8,17 +8,23 @@
 #include <igraph.h>
 
 #include "./exception.hpp"
+#include "./mapper.hpp"
 
 namespace igraph {
 
-template <typename PtrType = void *> class VectorPtr {
+template <typename Type> class VectorPtr {
+private:
+  typedef TypeMapper<Type> mapper;
+  typedef Type wrapper_t;
+  typedef typename mapper::type wrapped_t;
+
 public:
   /* Constructors and Destructors */
   ~VectorPtr() { igraph_vector_ptr_destroy(ptr()); }
   VectorPtr(long int size = 0) {
     SafeCall(igraph_vector_ptr_init(ptr(), size));
   }
-  VectorPtr(const VectorPtr &other) {
+  VectorPtr(const VectorPtr<Type> &other) {
     SafeCall(igraph_vector_ptr_copy(ptr(), other.ptr()));
   }
 
@@ -28,14 +34,14 @@ public:
 
   void clear() noexcept { igraph_vector_ptr_clear(ptr()); }
 
-  void push_back(PtrType element) {
-    void *element_pointer = reinterpret_cast<void *>(element);
+  void push_back(wrapper_t& element) {
+    void *element_pointer = reinterpret_cast<void *>(element.ptr());
     SafeCall(igraph_vector_ptr_push_back(ptr(), element_pointer));
   }
 
-  PtrType operator[](long int pos) const {
+  wrapper_t operator[](long int pos) const {
     void *element = VECTOR(*ptr())[pos];
-    return reinterpret_cast<PtrType>(element);
+    return mapper::Build(*reinterpret_cast<wrapped_t *>(element));
   }
 
   void resize(long int newsize) {

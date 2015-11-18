@@ -6,7 +6,8 @@ namespace igraph {
 
 /* Constructors and destructors */
 Matrix::~Matrix() {
-  if (owner()) igraph_matrix_destroy(ptr());
+  if (owner())
+    igraph_matrix_destroy(ptr());
 }
 Matrix::Matrix(long int nrow, long int ncol) {
   SafeCall(igraph_matrix_init(ptr(), nrow, ncol));
@@ -23,12 +24,12 @@ Matrix::Matrix(Matrix &&matrix) {
   matrix_ = *matrix.ptr();
   matrix.disown();
 }
-Matrix &Matrix::operator=(const Matrix &matrix) {
+Matrix &Matrix::operator=(const Matrix &matrix) & {
   this->~Matrix();
   SafeCall(igraph_matrix_copy(ptr(), matrix.ptr()));
   return *this;
 }
-Matrix &Matrix::operator=(Matrix &&matrix) {
+Matrix &Matrix::operator=(Matrix &&matrix) & {
   this->~Matrix();
   *ptr() = *matrix.ptr();
   matrix.disown();
@@ -224,4 +225,4 @@ void Matrix::remove_col(long int col) {
   SafeCall(igraph_matrix_remove_col(ptr(), col));
 }
 
-}  // namespace igraph
+} // namespace igraph
