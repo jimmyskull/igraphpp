@@ -9,14 +9,20 @@
 
 #include <igraph.h>
 
+#include "./mapper.hpp"
 #include "./util.hpp"
+#include "./vectorptr.hpp"
+#include "./vector.hpp"
 
 namespace igraph {
 
 class Vector;
 
 class Matrix {
-public:
+  template <typename>
+  friend struct TypeMapper;
+
+ public:
   /* Constructors and destructors */
   ~Matrix();
   Matrix(long int nrow = 0, long int ncol = 0);
@@ -35,7 +41,7 @@ public:
   void fill(double value) noexcept;
 
   /* Copying matrices */
-  void copy_to(double *to) noexcept; // Column major
+  void copy_to(double *to) noexcept;  // Column major
   void update(const Matrix &from);
   void swap(Matrix &m2);
 
@@ -115,11 +121,22 @@ public:
   igraph_matrix_t *ptr() { return &matrix_; }
   const igraph_matrix_t *ptr() const { return &matrix_; }
 
-private:
-  void disown() { ptr()->ncol = -1; }
-  bool owner() const { return ptr()->ncol != -1; }
+ protected:
+  Matrix(const igraph_matrix_t &matrix, bool owner = true);
+
+ private:
+  void disown() { owner_ = false; }
+  bool owner() const { return owner_; }
 
   igraph_matrix_t matrix_;
+  bool owner_ = true;
+};
+
+template <>
+struct TypeMapper<Matrix> {
+  typedef igraph_matrix_t type;
+
+  static Matrix Build(const type &vector) { return Matrix(vector, false); }
 };
 
 template <typename Iterator, typename>
@@ -136,6 +153,6 @@ Matrix::Matrix(Iterator begin, Iterator end, long int nrow, long int ncol)
   }
 }
 
-} // namespace igraph
+}  // namespace igraph
 
-#endif // IGRAPHPP_MATRIX_HPP_
+#endif  // IGRAPHPP_MATRIX_HPP_

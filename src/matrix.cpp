@@ -6,8 +6,7 @@ namespace igraph {
 
 /* Constructors and destructors */
 Matrix::~Matrix() {
-  if (owner())
-    igraph_matrix_destroy(ptr());
+  if (owner()) igraph_matrix_destroy(ptr());
 }
 Matrix::Matrix(long int nrow, long int ncol) {
   SafeCall(igraph_matrix_init(ptr(), nrow, ncol));
@@ -225,4 +224,7 @@ void Matrix::remove_col(long int col) {
   SafeCall(igraph_matrix_remove_col(ptr(), col));
 }
 
-} // namespace igraph
+Matrix::Matrix(const igraph_matrix_t &matrix, bool owner)
+    : matrix_(matrix), owner_(owner) {}
+
+}  // namespace igraph

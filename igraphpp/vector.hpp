@@ -13,6 +13,7 @@
 #include "./exception.hpp"
 #include "./mapper.hpp"
 #include "./util.hpp"
+#include "./vectorptr.hpp"
 
 namespace igraph {
 
@@ -228,6 +229,11 @@ struct TypeMapper<Vector> {
 
   static Vector Build(const type &vector) { return Vector(vector); }
 };
+
+/* VectorPtr<> cannot be specialized with Vector, because Vector manages its own
+ * memory */
+template <>
+class VectorPtr<Vector>;
 
 template <typename Iterator, typename>
 Vector::Vector(Iterator begin, Iterator end)

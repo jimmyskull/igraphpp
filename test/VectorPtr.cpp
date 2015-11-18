@@ -47,3 +47,21 @@ TEST_CASE("VectorPtr<VectorView>", "[VectorPtr]") {
   CHECK(vector[1].size() == 21);
 }
 
+TEST_CASE("VectorPtr<Matrix>", "[VectorPtr]") {
+  using igraph::VectorPtr;
+  using igraph::Matrix;
+
+  Matrix mat(10, 5);
+  mat.fill(0);
+  REQUIRE(mat.at(0, 0) == 0.0);
+
+  VectorPtr<Matrix> vector;
+  vector.push_back(mat);
+
+  CHECK(vector.size() == 1);
+  Matrix b = vector[0];
+  b.fill(1);
+
+  REQUIRE(mat.at(0, 0) == 1.0);
+}
+

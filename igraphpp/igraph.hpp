@@ -104,8 +104,8 @@ static inline int SetSeed(unsigned long int seed) {
 } // namespace igraph
 
 #include "./mapper.hpp"
-#include "./vector.hpp"
 #include "./vectorptr.hpp"
+#include "./vector.hpp"
 #include "./vertex_selector.hpp"
 #include "./vertex_iterator.hpp"
 #include "./edge_selector.hpp"
