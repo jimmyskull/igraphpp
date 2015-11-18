@@ -331,6 +331,50 @@ TEST_CASE("Graph — neighborhood of a vertex", "[Graph]") {
   CHECK(g.neighborhood_size({{1, 5}}) == Vector({2, 3}));
 }
 
+TEST_CASE("Graph — neighborhood of order", "[Graph]") {
+  using igraph::Graph;
+  using igraph::Vector;
+  using igraph::VectorView;
+  using igraph::VectorPtr;
+  using igraph::VertexSelector;
+
+  Graph g{{0, 1, 0, 2, 0, 3, 0, 4, 2, 5, 2, 6, 3, 5}};
+  REQUIRE(g.ecount() == 7);
+  REQUIRE(g.vcount() == 7);
+
+  VectorPtr<VectorView> nei = g.neighborhood(VertexSelector::All(), 2);
+  REQUIRE(nei.size() == g.vcount());
+  REQUIRE(nei[0] == Vector({0, 1, 2, 3, 4, 5, 6}));
+  REQUIRE(nei[1] == Vector({1, 0, 2, 3, 4}));
+  REQUIRE(nei[2] == Vector({2, 0, 5, 6, 1, 3, 4}));
+  REQUIRE(nei[3] == Vector({3, 0, 5, 1, 2, 4}));
+  REQUIRE(nei[4] == Vector({4, 0, 1, 2, 3}));
+  REQUIRE(nei[5] == Vector({5, 2, 3, 0, 6}));
+  REQUIRE(nei[6] == Vector({6, 2, 0, 5}));
+}
+
+TEST_CASE("Graph — neighborhood of order (graph)", "[Graph]") {
+  using igraph::Graph;
+  using igraph::Vector;
+  using igraph::VectorView;
+  using igraph::VectorPtr;
+  using igraph::VertexSelector;
+
+  Graph g{{0, 1, 0, 2, 0, 3, 0, 4, 2, 5, 2, 6, 3, 5}};
+  REQUIRE(g.ecount() == 7);
+  REQUIRE(g.vcount() == 7);
+
+  VectorPtr<Graph> nei = g.neighborhood_graphs(VertexSelector::All(), 2);
+  REQUIRE(nei.size() == g.vcount());
+  REQUIRE(nei[0].vcount() == 7);
+  REQUIRE(nei[1].vcount() == 5);
+  REQUIRE(nei[2].vcount() == 7);
+  REQUIRE(nei[3].vcount() == 6);
+  REQUIRE(nei[4].vcount() == 5);
+  REQUIRE(nei[5].vcount() == 5);
+  REQUIRE(nei[6].vcount() == 4);
+}
+
 TEST_CASE("Graph — graph components", "[Graph]") {
   using igraph::Graph;
   using igraph::Vector;

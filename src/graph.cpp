@@ -621,6 +621,20 @@ double Graph::neighborhood_size(int vertex, int order,
                                 NeighborMode mode) const {
   return neighborhood_size(VertexSelector::Single(vertex), order, mode).at(0);
 }
+VectorPtr<VectorView> Graph::neighborhood(const VertexSelector &vids, int order,
+                                          NeighborMode mode) {
+  VectorPtr<VectorView> result;
+  SafeCall(igraph_neighborhood(ptr(), result.ptr(), vids.vs(), order,
+                               static_cast<igraph_neimode_t>(mode)));
+  return result;
+}
+VectorPtr<Graph> Graph::neighborhood_graphs(const VertexSelector &vids,
+                                            int order, NeighborMode mode) {
+  VectorPtr<Graph> result;
+  SafeCall(igraph_neighborhood_graphs(ptr(), result.ptr(), vids.vs(), order,
+                               static_cast<igraph_neimode_t>(mode)));
+  return result;
+}
 
 /* Graph components */
 Vector Graph::subcomponent(int vertex, NeighborMode mode) const {

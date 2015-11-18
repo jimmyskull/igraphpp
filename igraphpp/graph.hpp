@@ -280,8 +280,12 @@ class Graph {
                            int order = 1, NeighborMode mode = Out) const;
   double neighborhood_size(int vertex, int order = 1,
                            NeighborMode mode = Out) const;
-  // Skipped igraph_neighborhood
-  // Skipped igraph_neighborhood_graphs
+  VectorPtr<VectorView> neighborhood(
+      const VertexSelector &vids = VertexSelector::All(), int order = 1,
+      NeighborMode mode = Out);
+  VectorPtr<Graph> neighborhood_graphs(
+      const VertexSelector &vids = VertexSelector::All(), int order = 1,
+      NeighborMode mode = Out);
 
   /* Graph components */
   Vector subcomponent(int vertex, NeighborMode mode = Out) const;
