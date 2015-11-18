@@ -153,7 +153,8 @@ TEST_CASE("Graph — deterministic generators", "[Graph]") {
   mat(1, 0) = 1;
   mat(1, 3) = 1;
   mat(1, 2) = 1;
-  Graph g = Graph::AdjacencyMatrix(mat, igraph::AdjacencyMatrixMode::Undirected);
+  Graph g =
+      Graph::AdjacencyMatrix(mat, igraph::AdjacencyMatrixMode::Undirected);
   CHECK(g.vcount() == 10);
   CHECK(g.ecount() == 3);
 

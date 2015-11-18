@@ -25,8 +25,7 @@ TEST_CASE("Matrix", "[Matrix]") {
   CHECK_FALSE(mat.contains(1));
 
   for (long int i = 0; i < N; ++i)
-    for (long int j = 0; j < N; ++j)
-      mat(i, j) = i + j * N + 1;
+    for (long int j = 0; j < N; ++j) mat(i, j) = i + j * N + 1;
 
   Vector seq(1, N * N);
   CHECK(seq.size() == N * N);
