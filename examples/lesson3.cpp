@@ -23,7 +23,7 @@ int main(void) {
   printf("Maximum degree is      %10.0f, vertex %2li.\n", result.max(),
          result.which_max());
 
-  result = graph.closeness(VertexSelector::All(), igraph::All);
+  result = graph.closeness(VertexSelector::All(), igraph::Mode::All);
   printf("Maximum closeness is   %10f, vertex %2li.\n", result.max(),
          result.which_max());
 

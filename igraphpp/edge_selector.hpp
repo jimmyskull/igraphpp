@@ -32,17 +32,17 @@ class EdgeSelector {
   int type() const noexcept;
 
   /* Vertex selector constructors */
-  static EdgeSelector All(EdgeOrder order = EdgeById);
-  static EdgeSelector Incident(int vid, NeighborMode mode = Out);
+  static EdgeSelector All(EdgeOrder order = EdgeOrder::ById);
+  static EdgeSelector Incident(int vid, Mode mode = Mode::Out);
   static EdgeSelector None();
   static EdgeSelector Single(int eid);
   static EdgeSelector FromVector(const VectorView &vector);
   static EdgeSelector Sequence(int from, int to);
   static EdgeSelector Pairs(const Vector &edge_vector,
-                            Directedness dir = Directed);
+                            bool directed = Directed);
   template <typename... Args, typename = typename std::enable_if<util::all_args(
                                   std::is_same<Args, int>::value...)>::type>
-  static EdgeSelector Pairs(Directedness dir, Args... args);
+  static EdgeSelector Pairs(bool directed, Args... args);
 
   const igraph_es_t &es() const { return es_; }
   igraph_es_t *ptr() { return &es_; }
@@ -62,9 +62,9 @@ EdgeSelector::EdgeSelector(Iterator begin, Iterator end) {
 }
 
 template <typename... Args, typename>
-EdgeSelector EdgeSelector::Pairs(Directedness dir, Args... args) {
+EdgeSelector EdgeSelector::Pairs(bool directed, Args... args) {
   igraph_es_t es;
-  SafeCall(igraph_es_pairs_small(&es, dir, args..., -1));
+  SafeCall(igraph_es_pairs_small(&es, directed, args..., -1));
   return EdgeSelector(es);
 }
 

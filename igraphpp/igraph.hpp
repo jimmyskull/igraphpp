@@ -13,93 +13,84 @@ using Edge = std::pair<int, int>;
 
 static constexpr double kInfinity = IGRAPH_INFINITY;
 
-enum Directedness {
-  Undirected = IGRAPH_UNDIRECTED,
-  Directed = IGRAPH_DIRECTED
+static constexpr bool Directed = IGRAPH_DIRECTED;
+static constexpr bool Undirected = IGRAPH_UNDIRECTED;
+
+enum class Connectedness { Weak = IGRAPH_WEAK, Strong = IGRAPH_STRONG };
+
+enum class MultiEdges { Ignore = false, OneOf = true };
+
+enum class Mode { Out = IGRAPH_OUT, In = IGRAPH_IN, All = IGRAPH_ALL };
+
+enum class Mutuality { None = false, MutualConnections = true };
+
+enum class Periodicity { None = false, Circular = true };
+
+enum class Loops { None = IGRAPH_NO_LOOPS, Allow = IGRAPH_LOOPS };
+
+enum class EdgeOrder {
+  ById = IGRAPH_EDGEORDER_ID,
+  BySourceId = IGRAPH_EDGEORDER_FROM,
+  ByTargetId = IGRAPH_EDGEORDER_TO
 };
 
-enum Connectedness {
-  WeaklyConnected = IGRAPH_WEAK,
-  StronglyConnected = IGRAPH_STRONG
+enum class AdjacencyMatrixMode {
+  Directed = IGRAPH_ADJ_DIRECTED,
+  Undirected = IGRAPH_ADJ_UNDIRECTED,
+  Max = IGRAPH_ADJ_MAX,
+  Min = IGRAPH_ADJ_MIN,
+  Plus = IGRAPH_ADJ_PLUS,
+  Upper = IGRAPH_ADJ_UPPER,
+  Lower = IGRAPH_ADJ_LOWER
 };
 
-enum MultiEdges { IgnoreMultiEdges = false, OneOfMultiEdges = true };
-
-enum NeighborMode { Out = IGRAPH_OUT, In = IGRAPH_IN, All = IGRAPH_ALL };
-
-enum Mutuality { NotMutual = false, MutualConnections = true };
-
-enum Periodicity { NotPeriodic = false, Circular = true };
-
-enum Loops { NoLoops = IGRAPH_NO_LOOPS, AllowLoops = IGRAPH_LOOPS };
-
-enum EdgeOrder {
-  EdgeById = IGRAPH_EDGEORDER_ID,
-  EdgeBySourceId = IGRAPH_EDGEORDER_FROM,
-  EdgeByTargetId = IGRAPH_EDGEORDER_TO
+enum class StarMode {
+  Out = IGRAPH_STAR_OUT,
+  In = IGRAPH_STAR_IN,
+  Mutual = IGRAPH_STAR_MUTUAL,
+  Undirected = IGRAPH_STAR_UNDIRECTED
 };
 
-enum AdjacencyMatrixMode {
-  AdjacencyDirected = IGRAPH_ADJ_DIRECTED,
-  AdjacencyUndirected = IGRAPH_ADJ_UNDIRECTED,
-  AdjacencyMax = IGRAPH_ADJ_MAX,
-  AdjacencyMin = IGRAPH_ADJ_MIN,
-  AdjacencyPlus = IGRAPH_ADJ_PLUS,
-  AdjacencyUpper = IGRAPH_ADJ_UPPER,
-  AdjacencyLower = IGRAPH_ADJ_LOWER
+enum class TreeMode {
+  Out = IGRAPH_TREE_OUT,
+  In = IGRAPH_TREE_IN,
+  Undirected = IGRAPH_TREE_UNDIRECTED
 };
 
-enum StarMode {
-  StarOut = IGRAPH_STAR_OUT,
-  StarIn = IGRAPH_STAR_IN,
-  StarMutual = IGRAPH_STAR_MUTUAL,
-  StarUndirected = IGRAPH_STAR_UNDIRECTED
+enum class BarabasiAlgorithm {
+  Bag = IGRAPH_BARABASI_BAG,
+  PSumTree = IGRAPH_BARABASI_PSUMTREE,
+  PSumTreeMultiple = IGRAPH_BARABASI_PSUMTREE_MULTIPLE
 };
 
-enum TreeMode {
-  TreeOut = IGRAPH_TREE_OUT,
-  TreeIn = IGRAPH_TREE_IN,
-  TreeUndirected = IGRAPH_TREE_UNDIRECTED
+enum class DegreeSequenceMethod {
+  Simple = IGRAPH_DEGSEQ_SIMPLE,
+  SimpleNoMultiple = IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE,
+  VL = IGRAPH_DEGSEQ_VL
 };
 
-enum BarabasiAlgorithm {
-  BarabasiBag = IGRAPH_BARABASI_BAG,
-  BarabasiPSumTree = IGRAPH_BARABASI_PSUMTREE,
-  BarabasiPSumTreeMultiple = IGRAPH_BARABASI_PSUMTREE_MULTIPLE
+enum class RewiringMode {
+  Simple = IGRAPH_REWIRING_SIMPLE,
+  SimpleLoops = IGRAPH_REWIRING_SIMPLE_LOOPS
 };
 
-enum DegreeSequenceMethod {
-  DegreeSequenceSimple = IGRAPH_DEGSEQ_SIMPLE,
-  DegreeSequenceSimpleNoMultiple = IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE,
-  DegreeSequenceVL = IGRAPH_DEGSEQ_VL
+enum class SubgraphImplementation {
+  CopyAndDelete = IGRAPH_SUBGRAPH_COPY_AND_DELETE,
+  CreateFromScratch = IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH
 };
 
-enum RewiringMode {
-  RewiringSimple = IGRAPH_REWIRING_SIMPLE,
-  RewiringSimpleLoops = IGRAPH_REWIRING_SIMPLE_LOOPS
+enum class DirectedMode {
+  Arbitrary = IGRAPH_TO_DIRECTED_ARBITRARY,
+  Mutual = IGRAPH_TO_DIRECTED_MUTUAL
 };
 
-enum SubgraphImplementation {
-  SubgraphCopyAndDelete = IGRAPH_SUBGRAPH_COPY_AND_DELETE,
-  SubgraphCreateFromScratch = IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH
+enum class UndirectedMode {
+  Each = IGRAPH_TO_UNDIRECTED_EACH,
+  Collapse = IGRAPH_TO_UNDIRECTED_COLLAPSE,
+  Mutual = IGRAPH_TO_UNDIRECTED_MUTUAL
 };
 
-enum DirectedMode {
-  DirectedArbitrary = IGRAPH_TO_DIRECTED_ARBITRARY,
-  DirectedMutual = IGRAPH_TO_DIRECTED_MUTUAL
-};
-
-enum UndirectedMode {
-  UndirectedEach = IGRAPH_TO_UNDIRECTED_EACH,
-  UndirectedCollapse = IGRAPH_TO_UNDIRECTED_COLLAPSE,
-  UndirectedMutual = IGRAPH_TO_UNDIRECTED_MUTUAL
-};
-
-static inline int SetSeed(unsigned long int seed) {
-  igraph_rng_t *rng = igraph_rng_default();
-  int ret = igraph_rng_seed(rng, seed);
-  return SafeCall(ret);
-}
+int SetSeed(unsigned long int seed);
 
 }  // namespace igraph
 

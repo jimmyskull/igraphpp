@@ -153,11 +153,11 @@ TEST_CASE("Graph — deterministic generators", "[Graph]") {
   mat(1, 0) = 1;
   mat(1, 3) = 1;
   mat(1, 2) = 1;
-  Graph g = Graph::AdjacencyMatrix(mat, igraph::AdjacencyUndirected);
+  Graph g = Graph::AdjacencyMatrix(mat, igraph::AdjacencyMatrixMode::Undirected);
   CHECK(g.vcount() == 10);
   CHECK(g.ecount() == 3);
 
-  Graph star = Graph::Star(10, igraph::StarOut, 3);
+  Graph star = Graph::Star(10, igraph::StarMode::Out, 3);
   CHECK(star.degree(3) == 9);
 
   Graph lat = Graph::Lattice(Vector({3, 3}), 1);
@@ -416,7 +416,7 @@ TEST_CASE("Graph — centrality measures", "[Graph]") {
   Vector closeness = g.closeness(VertexSelector::All());
   CHECK(closeness[0] == Approx(0.111111));
   for (int i = 1; i < 10; ++i) CHECK(closeness[i] == Approx(0.0111111));
-  CHECK(g.closeness(0, igraph::Out, Vector(1, g.ecount())) ==
+  CHECK(g.closeness(0, igraph::Mode::Out, Vector(1, g.ecount())) ==
         Approx(0.0222222222));
 
   g.add_edges({1, 2, 2, 3, 4, 7});

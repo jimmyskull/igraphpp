@@ -8,8 +8,9 @@ int main(void) {
   using std::cout;
 
   Vector dim{{30, 30}};
-  Graph graph = Graph::Lattice(dim, 0, igraph::Undirected, igraph::NotMutual,
-                               igraph::Circular);
+  Graph graph =
+      Graph::Lattice(dim, 0, igraph::Undirected, igraph::Mutuality::None,
+                     igraph::Periodicity::Circular);
 
   igraph::SetSeed(42);
 

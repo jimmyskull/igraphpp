@@ -31,8 +31,8 @@ class VertexSelector {
 
   /* Vertex selector constructors */
   static VertexSelector All();
-  static VertexSelector Adjacent(int vid, NeighborMode mode = Out);
-  static VertexSelector NonAdjacent(int vid, NeighborMode mode = Out);
+  static VertexSelector Adjacent(int vid, Mode mode = Mode::Out);
+  static VertexSelector NonAdjacent(int vid, Mode mode = Mode::Out);
   static VertexSelector None();
   static VertexSelector Single(int vid);
   // VectorView will not copy the contents of |vector|.

@@ -35,7 +35,7 @@ EdgeSelector EdgeSelector::All(EdgeOrder order) {
       igraph_ess_all(static_cast<igraph_edgeorder_type_t>(order)));
   return instance;
 }
-EdgeSelector EdgeSelector::Incident(int vid, NeighborMode mode) {
+EdgeSelector EdgeSelector::Incident(int vid, Mode mode) {
   igraph_es_t es;
   SafeCall(igraph_es_incident(&es, vid, static_cast<igraph_neimode_t>(mode)));
   return EdgeSelector(es);
@@ -56,9 +56,9 @@ EdgeSelector EdgeSelector::Sequence(int from, int to) {
   static EdgeSelector instance(igraph_ess_seq(from, to));
   return instance;
 }
-EdgeSelector EdgeSelector::Pairs(const Vector &edge_vector, Directedness dir) {
+EdgeSelector EdgeSelector::Pairs(const Vector &edge_vector, bool directed) {
   igraph_es_t es;
-  SafeCall(igraph_es_pairs(&es, edge_vector.ptr(), dir));
+  SafeCall(igraph_es_pairs(&es, edge_vector.ptr(), directed));
   return EdgeSelector(es);
 }
 

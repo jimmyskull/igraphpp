@@ -31,12 +31,12 @@ VertexSelector VertexSelector::All() {
   static VertexSelector instance(igraph_vss_all());
   return instance;
 }
-VertexSelector VertexSelector::Adjacent(int vid, NeighborMode mode) {
+VertexSelector VertexSelector::Adjacent(int vid, Mode mode) {
   igraph_vs_t vs;
   SafeCall(igraph_vs_adj(&vs, vid, static_cast<igraph_neimode_t>(mode)));
   return VertexSelector(vs);
 }
-VertexSelector VertexSelector::NonAdjacent(int vid, NeighborMode mode) {
+VertexSelector VertexSelector::NonAdjacent(int vid, Mode mode) {
   igraph_vs_t vs;
   SafeCall(igraph_vs_nonadj(&vs, vid, static_cast<igraph_neimode_t>(mode)));
   return VertexSelector(vs);

@@ -16,16 +16,16 @@ namespace igraph {
 Graph::~Graph() {
   if (owner()) SafeCall(igraph_destroy(ptr()));
 }
-Graph::Graph(long int vertices, Directedness dir) {
-  SafeCall(igraph_empty(ptr(), vertices, dir));
+Graph::Graph(long int vertices, bool directed) {
+  SafeCall(igraph_empty(ptr(), vertices, directed));
 }
-Graph::Graph(const VectorView &edges, long int vertices, Directedness dir) {
-  SafeCall(igraph_create(ptr(), edges.ptr(), vertices, dir));
+Graph::Graph(const VectorView &edges, long int vertices, bool directed) {
+  SafeCall(igraph_create(ptr(), edges.ptr(), vertices, directed));
 }
 Graph::Graph(std::initializer_list<double> edges, long int vertices,
-             Directedness dir) {
+             bool directed) {
   Vector vector(edges);
-  SafeCall(igraph_create(ptr(), vector.ptr(), vertices, dir));
+  SafeCall(igraph_create(ptr(), vector.ptr(), vertices, directed));
 }
 Graph::Graph(const Graph &other) {
   SafeCall(igraph_copy(&graph_, &other.graph_));
@@ -55,86 +55,88 @@ Edge Graph::edge(int eid) const {
   SafeCall(igraph_edge(ptr(), eid, &from, &to));
   return std::make_pair(from, to);
 }
-int Graph::eid(int from, int to, Directedness dir) const {
+int Graph::eid(int from, int to, bool directed) const {
   int eid;
-  SafeCall(igraph_get_eid(ptr(), &eid, from, to, dir, false));
+  SafeCall(igraph_get_eid(ptr(), &eid, from, to, directed, false));
   return eid;
 }
 // Edge eids between pairs of vertices
-Vector Graph::pairs_eids(const VectorView &pairs, Directedness dir,
+Vector Graph::pairs_eids(const VectorView &pairs, bool directed,
                          MultiEdges multiedges) const {
   Vector eids;
-  if (multiedges == IgnoreMultiEdges) {
-    SafeCall(igraph_get_eids(ptr(), eids.ptr(), pairs.ptr(), NULL, dir, false));
+  if (multiedges == MultiEdges::Ignore) {
+    SafeCall(
+        igraph_get_eids(ptr(), eids.ptr(), pairs.ptr(), NULL, directed, false));
   } else {
-    SafeCall(igraph_get_eids_multi(ptr(), eids.ptr(), pairs.ptr(), NULL, dir,
-                                   false));
+    SafeCall(igraph_get_eids_multi(ptr(), eids.ptr(), pairs.ptr(), NULL,
+                                   directed, false));
   }
   return eids;
 }
-Vector Graph::pairs_eids(std::initializer_list<double> pairs, Directedness dir,
+Vector Graph::pairs_eids(std::initializer_list<double> pairs, bool directed,
                          MultiEdges multiedges) const {
   Vector vector(pairs);
-  return pairs_eids(vector, dir, multiedges);
+  return pairs_eids(vector, directed, multiedges);
 }
 // Edges composing a path
-Vector Graph::path_eids(const VectorView &path, Directedness dir,
+Vector Graph::path_eids(const VectorView &path, bool directed,
                         MultiEdges multiedges) const {
   Vector eids;
-  if (multiedges == IgnoreMultiEdges) {
-    SafeCall(igraph_get_eids(ptr(), eids.ptr(), NULL, path.ptr(), dir, false));
-  } else {
+  if (multiedges == MultiEdges::Ignore) {
     SafeCall(
-        igraph_get_eids_multi(ptr(), eids.ptr(), NULL, path.ptr(), dir, false));
+        igraph_get_eids(ptr(), eids.ptr(), NULL, path.ptr(), directed, false));
+  } else {
+    SafeCall(igraph_get_eids_multi(ptr(), eids.ptr(), NULL, path.ptr(),
+                                   directed, false));
   }
   return eids;
 }
-Vector Graph::path_eids(std::initializer_list<double> path, Directedness dir,
+Vector Graph::path_eids(std::initializer_list<double> path, bool directed,
                         MultiEdges multiedges) const {
   Vector vector(path);
-  return path_eids(vector, dir, multiedges);
+  return path_eids(vector, directed, multiedges);
 }
 // Concatenation of |pairs_eids()| and |path_eids()|
 Vector Graph::eids(const VectorView &pairs, const VectorView &path,
-                   Directedness dir, MultiEdges multiedges) const {
+                   bool directed, MultiEdges multiedges) const {
   Vector eids;
-  if (multiedges == IgnoreMultiEdges) {
-    SafeCall(igraph_get_eids(ptr(), eids.ptr(), pairs.ptr(), path.ptr(), dir,
-                             false));
+  if (multiedges == MultiEdges::Ignore) {
+    SafeCall(igraph_get_eids(ptr(), eids.ptr(), pairs.ptr(), path.ptr(),
+                             directed, false));
   } else {
     SafeCall(igraph_get_eids_multi(ptr(), eids.ptr(), pairs.ptr(), path.ptr(),
-                                   dir, false));
+                                   directed, false));
   }
   return eids;
 }
 Vector Graph::eids(std::initializer_list<double> pairs,
-                   std::initializer_list<double> path, Directedness dir,
+                   std::initializer_list<double> path, bool directed,
                    MultiEdges multiedges) const {
   Vector vpairs(pairs);
   Vector vpath(path);
-  return eids(vpairs, vpath, dir, multiedges);
+  return eids(vpairs, vpath, directed, multiedges);
 }
-Vector Graph::neighbors(int vertex, NeighborMode mode) const {
+Vector Graph::neighbors(int vertex, Mode mode) const {
   Vector neighbors;
   SafeCall(igraph_neighbors(ptr(), neighbors.ptr(), vertex,
                             static_cast<igraph_neimode_t>(mode)));
   return neighbors;
 }
-Vector Graph::incident(int vertex, NeighborMode mode) const {
+Vector Graph::incident(int vertex, Mode mode) const {
   Vector incident;
   SafeCall(igraph_incident(ptr(), incident.ptr(), vertex,
                            static_cast<igraph_neimode_t>(mode)));
   return incident;
 }
 bool Graph::is_directed() const noexcept { return igraph_is_directed(&graph_); }
-Vector Graph::degree(const VertexSelector &vids, NeighborMode mode,
-                     Loops loops) const {
+Vector Graph::degree(const VertexSelector &vids, Mode mode, Loops loops) const {
   Vector degrees;
   SafeCall(igraph_degree(ptr(), degrees.ptr(), vids.vs(),
-                         static_cast<igraph_neimode_t>(mode), loops));
+                         static_cast<igraph_neimode_t>(mode),
+                         static_cast<igraph_bool_t>(loops)));
   return degrees;
 }
-double Graph::degree(int vertex, NeighborMode mode, Loops loops) const {
+double Graph::degree(int vertex, Mode mode, Loops loops) const {
   return degree(VertexSelector::Single(vertex), mode, loops).at(0);
 }
 
@@ -181,17 +183,19 @@ Graph Graph::Star(int vertices, StarMode mode, int center_vertex) {
                        center_vertex));
   return Graph(graph);
 }
-Graph Graph::Lattice(const VectorView &dimension, int nei, Directedness dir,
+Graph Graph::Lattice(const VectorView &dimension, int nei, bool directed,
                      Mutuality mutual, Periodicity periodicity) {
   igraph_t graph;
-  SafeCall(
-      igraph_lattice(&graph, dimension.ptr(), nei, dir, mutual, periodicity));
+  SafeCall(igraph_lattice(&graph, dimension.ptr(), nei, directed,
+                          static_cast<igraph_bool_t>(mutual),
+                          static_cast<igraph_bool_t>(periodicity)));
   return Graph(graph);
 }
-Graph Graph::Ring(int vertices, Directedness dir, Mutuality mutual,
+Graph Graph::Ring(int vertices, bool directed, Mutuality mutual,
                   bool circular) {
   igraph_t graph;
-  SafeCall(igraph_ring(&graph, vertices, dir, mutual, circular));
+  SafeCall(igraph_ring(&graph, vertices, directed,
+                       static_cast<igraph_bool_t>(mutual), circular));
   return Graph(graph);
 }
 Graph Graph::Tree(int vertices, int children, TreeMode mode) {
@@ -200,14 +204,15 @@ Graph Graph::Tree(int vertices, int children, TreeMode mode) {
                        static_cast<igraph_tree_mode_t>(mode)));
   return Graph(graph);
 }
-Graph Graph::Full(int vertices, Directedness dir, Loops loops) {
+Graph Graph::Full(int vertices, bool directed, Loops loops) {
   igraph_t graph;
-  SafeCall(igraph_full(&graph, vertices, dir, loops));
+  SafeCall(igraph_full(&graph, vertices, directed,
+                       static_cast<igraph_bool_t>(loops)));
   return Graph(graph);
 }
-Graph Graph::FullCitation(int vertices, Directedness dir) {
+Graph Graph::FullCitation(int vertices, bool directed) {
   igraph_t graph;
-  SafeCall(igraph_full_citation(&graph, vertices, dir));
+  SafeCall(igraph_full_citation(&graph, vertices, directed));
   return Graph(graph);
 }
 Graph Graph::Famous(const char *name) {
@@ -245,7 +250,7 @@ Graph Graph::ExtendedChordalRing(int vertices, const Matrix &W) {
   SafeCall(igraph_extended_chordal_ring(&graph, vertices, W.ptr()));
   return Graph(graph);
 }
-void Graph::connect_neighborhood(int order, NeighborMode mode) {
+void Graph::connect_neighborhood(int order, Mode mode) {
   SafeCall(igraph_connect_neighborhood(ptr(), order,
                                        static_cast<igraph_neimode_t>(mode)));
 }
@@ -257,48 +262,49 @@ Graph Graph::GRG(int vertices, double radius, bool torus) {
   return Graph(graph);
 }
 Graph Graph::Barabasi(int vertices, double power, int m, bool outpref, double A,
-                      Directedness dir, BarabasiAlgorithm algo,
+                      bool directed, BarabasiAlgorithm algo,
                       const Graph &start_graph) {
   igraph_t graph;
   const igraph_t *start = start_graph.vcount() ? start_graph.ptr() : NULL;
   SafeCall(igraph_barabasi_game(
-      &graph, vertices, power, m, NULL, outpref, A, dir,
+      &graph, vertices, power, m, NULL, outpref, A, directed,
       static_cast<igraph_barabasi_algorithm_t>(algo), start));
   return Graph(graph);
 }
 Graph Graph::Barabasi(int vertices, double power, const VectorView &outseq,
-                      bool outpref, double A, Directedness dir,
+                      bool outpref, double A, bool directed,
                       BarabasiAlgorithm algo, const Graph &start_graph) {
   igraph_t graph;
   const igraph_t *start = start_graph.vcount() ? start_graph.ptr() : NULL;
   SafeCall(igraph_barabasi_game(
-      &graph, vertices, power, 0, outseq.ptr(), outpref, A, dir,
+      &graph, vertices, power, 0, outseq.ptr(), outpref, A, directed,
       static_cast<igraph_barabasi_algorithm_t>(algo), start));
   return Graph(graph);
 }
-Graph Graph::ErdosRenyi(int vertices, double prob, Directedness dir,
-                        Loops loops) {
+Graph Graph::ErdosRenyi(int vertices, double prob, bool directed, Loops loops) {
   igraph_t graph;
   SafeCall(igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, vertices,
-                                   prob, dir, loops));
+                                   prob, directed,
+                                   static_cast<igraph_bool_t>(loops)));
   return Graph(graph);
 }
-Graph Graph::ErdosRenyi(int vertices, int edges, Directedness dir,
-                        Loops loops) {
+Graph Graph::ErdosRenyi(int vertices, int edges, bool directed, Loops loops) {
   igraph_t graph;
   SafeCall(igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNM, vertices,
-                                   edges, dir, loops));
+                                   edges, directed,
+                                   static_cast<igraph_bool_t>(loops)));
   return Graph(graph);
 }
 Graph Graph::WattsStrogatz(int dim, int size, int nei, double p, Loops loops,
                            bool multiple) {
   igraph_t graph;
-  SafeCall(
-      igraph_watts_strogatz_game(&graph, dim, size, nei, p, loops, multiple));
+  SafeCall(igraph_watts_strogatz_game(
+      &graph, dim, size, nei, p, static_cast<igraph_bool_t>(loops), multiple));
   return Graph(graph);
 }
 void Graph::rewire_edges(double prob, Loops loops, bool multiple) {
-  SafeCall(igraph_rewire_edges(ptr(), prob, loops, multiple));
+  SafeCall(igraph_rewire_edges(ptr(), prob, static_cast<igraph_bool_t>(loops),
+                               multiple));
 }
 Graph Graph::DegreeSequence(const VectorView &degrees,
                             DegreeSequenceMethod method) {
@@ -314,9 +320,9 @@ Graph Graph::DegreeSequence(const VectorView &out_deq, const VectorView &in_deq,
                                        static_cast<igraph_degseq_t>(method)));
   return Graph(graph);
 }
-Graph Graph::kRegular(int vertices, int k, Directedness dir, bool multiple) {
+Graph Graph::kRegular(int vertices, int k, bool directed, bool multiple) {
   igraph_t graph;
-  SafeCall(igraph_k_regular_game(&graph, vertices, k, dir, multiple));
+  SafeCall(igraph_k_regular_game(&graph, vertices, k, directed, multiple));
   return Graph(graph);
 }
 Graph Graph::StaticFitness(int vertices, const VectorView &fitness, Loops loops,
@@ -324,7 +330,7 @@ Graph Graph::StaticFitness(int vertices, const VectorView &fitness, Loops loops,
   igraph_t graph;
   SafeCall(igraph_static_fitness_game(
       &graph, vertices, const_cast<igraph_vector_t *>(fitness.ptr()), NULL,
-      loops, multiple));
+      static_cast<igraph_bool_t>(loops), multiple));
   return Graph(graph);
 }
 Graph Graph::StaticFitness(int vertices, const VectorView &fitness_out,
@@ -333,62 +339,62 @@ Graph Graph::StaticFitness(int vertices, const VectorView &fitness_out,
   igraph_t graph;
   SafeCall(igraph_static_fitness_game(
       &graph, vertices, const_cast<igraph_vector_t *>(fitness_out.ptr()),
-      const_cast<igraph_vector_t *>(fitness_in.ptr()), loops, multiple));
+      const_cast<igraph_vector_t *>(fitness_in.ptr()),
+      static_cast<igraph_bool_t>(loops), multiple));
   return Graph(graph);
 }
 Graph Graph::StaticPowerLaw(int vertices, int edges, double exponent_out,
                             double exponent_in, Loops loops, bool multiple,
                             bool finite_size_correlation) {
   igraph_t graph;
-  SafeCall(igraph_static_power_law_game(&graph, vertices, edges, exponent_out,
-                                        exponent_in, loops, multiple,
-                                        finite_size_correlation));
+  SafeCall(igraph_static_power_law_game(
+      &graph, vertices, edges, exponent_out, exponent_in,
+      static_cast<igraph_bool_t>(loops), multiple, finite_size_correlation));
   return Graph(graph);
 }
 Graph Graph::ForestFire(int vertices, double fw_prob, double bw_factor,
-                        int pambs, Directedness dir) {
+                        int pambs, bool directed) {
   igraph_t graph;
   SafeCall(igraph_forest_fire_game(&graph, vertices, fw_prob, bw_factor, pambs,
-                                   dir));
+                                   directed));
   return Graph(graph);
 }
 void Graph::rewire(int trials, RewiringMode mode) {
   SafeCall(igraph_rewire(ptr(), trials, static_cast<igraph_rewiring_t>(mode)));
 }
-Graph Graph::GrowingRandom(int vertices, int m, Directedness dir,
-                           bool citation) {
+Graph Graph::GrowingRandom(int vertices, int m, bool directed, bool citation) {
   igraph_t graph;
-  SafeCall(igraph_growing_random_game(&graph, vertices, m, dir, citation));
+  SafeCall(igraph_growing_random_game(&graph, vertices, m, directed, citation));
   return Graph(graph);
 }
 Graph Graph::CallawayTraits(int vertices, int types, int edges_per_step,
                             const VectorView &type_dist,
-                            const Matrix &pref_matrix, Directedness dir) {
+                            const Matrix &pref_matrix, bool directed) {
   igraph_t graph;
   SafeCall(igraph_callaway_traits_game(
       &graph, vertices, types, edges_per_step,
       const_cast<igraph_vector_t *>(type_dist.ptr()),
-      const_cast<igraph_matrix_t *>(pref_matrix.ptr()), dir));
+      const_cast<igraph_matrix_t *>(pref_matrix.ptr()), directed));
   return Graph(graph);
 }
 Graph Graph::Establishment(int vertices, int types, int trials_per_step,
                            const VectorView &type_dist,
-                           const Matrix &pref_matrix, Directedness dir) {
+                           const Matrix &pref_matrix, bool directed) {
   igraph_t graph;
   SafeCall(igraph_establishment_game(
       &graph, vertices, types, trials_per_step,
       const_cast<igraph_vector_t *>(type_dist.ptr()),
-      const_cast<igraph_matrix_t *>(pref_matrix.ptr()), dir));
+      const_cast<igraph_matrix_t *>(pref_matrix.ptr()), directed));
   return Graph(graph);
 }
 Graph Graph::Preference(int vertices, int types, const VectorView &type_dist,
                         bool fixed_sizes, const Matrix &pref_matrix,
-                        Directedness dir, Loops loops) {
+                        bool directed, Loops loops) {
   igraph_t graph;
   SafeCall(igraph_preference_game(
       &graph, vertices, types, const_cast<igraph_vector_t *>(type_dist.ptr()),
-      fixed_sizes, const_cast<igraph_matrix_t *>(pref_matrix.ptr()), NULL, dir,
-      loops));
+      fixed_sizes, const_cast<igraph_matrix_t *>(pref_matrix.ptr()), NULL,
+      directed, static_cast<igraph_bool_t>(loops)));
   return Graph(graph);
 }
 Graph Graph::AsymmetricPreference(int vertices, int types,
@@ -398,70 +404,72 @@ Graph Graph::AsymmetricPreference(int vertices, int types,
   SafeCall(igraph_asymmetric_preference_game(
       &graph, vertices, types,
       const_cast<igraph_matrix_t *>(type_dist_matrix.ptr()),
-      const_cast<igraph_matrix_t *>(pref_matrix.ptr()), NULL, NULL, loops));
+      const_cast<igraph_matrix_t *>(pref_matrix.ptr()), NULL, NULL,
+      static_cast<igraph_bool_t>(loops)));
   return Graph(graph);
 }
 Graph Graph::RecentDegree(int vertices, double power, int window, bool outpref,
-                          double zero_appeal, Directedness dir) {
+                          double zero_appeal, bool directed) {
   igraph_t graph;
   SafeCall(igraph_recent_degree_game(&graph, vertices, power, window, 0, NULL,
-                                     outpref, zero_appeal, dir));
+                                     outpref, zero_appeal, directed));
   return Graph(graph);
 }
 Graph Graph::RecentDegree(int vertices, double power, int window, int m,
                           const VectorView &outseq, bool outpref,
-                          double zero_appeal, Directedness dir) {
+                          double zero_appeal, bool directed) {
   igraph_t graph;
   SafeCall(igraph_recent_degree_game(&graph, vertices, power, window, m,
-                                     outseq.ptr(), outpref, zero_appeal, dir));
+                                     outseq.ptr(), outpref, zero_appeal,
+                                     directed));
   return Graph(graph);
 }
 Graph Graph::BarabasiAging(int vertices, int m, bool outpref, double pa_exp,
                            double aging_exp, int aging_bin,
                            double zero_deg_appeal, double zero_age_appeal,
-                           double deg_coef, double age_coef, Directedness dir) {
+                           double deg_coef, double age_coef, bool directed) {
   igraph_t graph;
   SafeCall(igraph_barabasi_aging_game(
       &graph, vertices, m, NULL, outpref, pa_exp, aging_exp, aging_bin,
-      zero_deg_appeal, zero_age_appeal, deg_coef, age_coef, dir));
+      zero_deg_appeal, zero_age_appeal, deg_coef, age_coef, directed));
   return Graph(graph);
 }
 Graph Graph::BarabasiAging(int vertices, const VectorView &outseq, bool outpref,
                            double pa_exp, double aging_exp, int aging_bin,
                            double zero_deg_appeal, double zero_age_appeal,
-                           double deg_coef, double age_coef, Directedness dir) {
+                           double deg_coef, double age_coef, bool directed) {
   igraph_t graph;
   SafeCall(igraph_barabasi_aging_game(
       &graph, vertices, 0, outseq.ptr(), outpref, pa_exp, aging_exp, aging_bin,
-      zero_deg_appeal, zero_age_appeal, deg_coef, age_coef, dir));
+      zero_deg_appeal, zero_age_appeal, deg_coef, age_coef, directed));
   return Graph(graph);
 }
 Graph Graph::RecentDegreeAging(int vertices, int m, bool outpref, double pa_exp,
                                double aging_exp, int aging_bin,
                                double time_window, double zero_appeal,
-                               Directedness dir) {
+                               bool directed) {
   igraph_t graph;
   SafeCall(igraph_recent_degree_aging_game(&graph, vertices, m, NULL, outpref,
                                            pa_exp, aging_exp, aging_bin,
-                                           time_window, zero_appeal, dir));
+                                           time_window, zero_appeal, directed));
   return Graph(graph);
 }
 Graph Graph::RecentDegreeAging(int vertices, const VectorView &outseq,
                                bool outpref, double pa_exp, double aging_exp,
                                int aging_bin, double time_window,
-                               double zero_appeal, Directedness dir) {
+                               double zero_appeal, bool directed) {
   igraph_t graph;
   SafeCall(igraph_recent_degree_aging_game(
       &graph, vertices, 0, outseq.ptr(), outpref, pa_exp, aging_exp, aging_bin,
-      time_window, zero_appeal, dir));
+      time_window, zero_appeal, directed));
   return Graph(graph);
 }
 Graph Graph::CitedType(int vertices, const VectorView &types,
                        const VectorView &pref, int edges_per_step,
-                       Directedness dir) {
+                       bool directed) {
   igraph_t graph;
   SafeCall(igraph_cited_type_game(&graph, vertices, types.ptr(), pref.ptr(),
-                                  edges_per_step, dir));
+                                  edges_per_step, directed));
   return Graph(graph);
 }
 
@@ -477,14 +485,13 @@ bool Graph::are_connected(int v1, int v2) const {
 
 /* Shortest path related functions */
 Matrix Graph::shortest_paths(const VertexSelector &from,
-                             const VertexSelector &to,
-                             NeighborMode mode) const {
+                             const VertexSelector &to, Mode mode) const {
   Matrix result(from.size(*this), to.size(*this));
   SafeCall(igraph_shortest_paths(ptr(), result.ptr(), from.vs(), to.vs(),
                                  static_cast<igraph_neimode_t>(mode)));
   return result;
 }
-double Graph::shortest_paths(int from, int to, NeighborMode mode) const {
+double Graph::shortest_paths(int from, int to, Mode mode) const {
   return shortest_paths(VertexSelector::Single(from),
                         VertexSelector::Single(to), mode)
       .at(0, 0);
@@ -492,7 +499,7 @@ double Graph::shortest_paths(int from, int to, NeighborMode mode) const {
 Matrix Graph::shortest_paths_dijkstra(const VertexSelector &from,
                                       const VertexSelector &to,
                                       const VectorView &weights,
-                                      NeighborMode mode) const {
+                                      Mode mode) const {
   Matrix result(from.size(*this), to.size(*this));
   SafeCall(igraph_shortest_paths_dijkstra(ptr(), result.ptr(), from.vs(),
                                           to.vs(), weights.ptr(),
@@ -501,7 +508,7 @@ Matrix Graph::shortest_paths_dijkstra(const VertexSelector &from,
 }
 double Graph::shortest_paths_dijkstra(int from, int to,
                                       const VectorView &weights,
-                                      NeighborMode mode) const {
+                                      Mode mode) const {
   return shortest_paths_dijkstra(VertexSelector::Single(from),
                                  VertexSelector::Single(to), weights, mode)
       .at(0, 0);
@@ -509,7 +516,7 @@ double Graph::shortest_paths_dijkstra(int from, int to,
 Matrix Graph::shortest_paths_bellman_ford(const VertexSelector &from,
                                           const VertexSelector &to,
                                           const VectorView &weights,
-                                          NeighborMode mode) const {
+                                          Mode mode) const {
   Matrix result(from.size(*this), to.size(*this));
   SafeCall(igraph_shortest_paths_bellman_ford(
       ptr(), result.ptr(), from.vs(), to.vs(), weights.ptr(),
@@ -518,7 +525,7 @@ Matrix Graph::shortest_paths_bellman_ford(const VertexSelector &from,
 }
 double Graph::shortest_paths_bellman_ford(int from, int to,
                                           const VectorView &weights,
-                                          NeighborMode mode) const {
+                                          Mode mode) const {
   return shortest_paths_bellman_ford(VertexSelector::Single(from),
                                      VertexSelector::Single(to), weights, mode)
       .at(0, 0);
@@ -543,44 +550,43 @@ double Graph::shortest_paths_johnson(int from, int to,
 // Skipped igraph_get_shortest_path_dijkstra
 // Skipped igraph_get_all_shortest_paths
 // Skipped igraph_get_all_shortest_paths_dijkstra
-double Graph::average_path_length(Directedness dir, bool unconnected) const {
+double Graph::average_path_length(bool directed, bool unconnected) const {
   double ret;
-  SafeCall(igraph_average_path_length(&graph_, &ret, dir, unconnected));
+  SafeCall(igraph_average_path_length(&graph_, &ret, directed, unconnected));
   return ret;
 }
-Vector Graph::path_length_hist(Directedness dir, double *unconnected) const {
+Vector Graph::path_length_hist(bool directed, double *unconnected) const {
   Vector result;
-  SafeCall(igraph_path_length_hist(ptr(), result.ptr(), unconnected, dir));
+  SafeCall(igraph_path_length_hist(ptr(), result.ptr(), unconnected, directed));
   return result;
 }
-int Graph::diameter(int *source_vertex, int *target_vertex, Directedness dir,
+int Graph::diameter(int *source_vertex, int *target_vertex, bool directed,
                     bool unconnected) const {
   int length = 0;
   SafeCall(igraph_diameter(&graph_, &length, source_vertex, target_vertex, NULL,
-                           dir, unconnected));
+                           directed, unconnected));
   return length;
 }
-int Graph::diameter(VectorView &path, Directedness dir,
-                    bool unconnected) const {
+int Graph::diameter(VectorView &path, bool directed, bool unconnected) const {
   int length = 0;
-  SafeCall(igraph_diameter(&graph_, &length, NULL, NULL, path.ptr(), dir,
+  SafeCall(igraph_diameter(&graph_, &length, NULL, NULL, path.ptr(), directed,
                            unconnected));
   return length;
 }
 double Graph::diameter_dijkstra(const VectorView &weights, int *source_vertex,
-                                int *target_vertex, Directedness dir,
+                                int *target_vertex, bool directed,
                                 bool unconnected) const {
   double result = 0;
   SafeCall(igraph_diameter_dijkstra(&graph_, weights.ptr(), &result,
-                                    source_vertex, target_vertex, NULL, dir,
-                                    unconnected));
+                                    source_vertex, target_vertex, NULL,
+                                    directed, unconnected));
   return result;
 }
 double Graph::diameter_dijkstra(const VectorView &weights, VectorView &path,
-                                Directedness dir, bool unconnected) const {
+                                bool directed, bool unconnected) const {
   double result = 0;
   SafeCall(igraph_diameter_dijkstra(&graph_, weights.ptr(), &result, NULL, NULL,
-                                    path.ptr(), dir, unconnected));
+                                    path.ptr(), directed, unconnected));
   return result;
 }
 int Graph::girth() const {
@@ -593,17 +599,16 @@ int Graph::girth(VectorView &circle) const {
   SafeCall(igraph_girth(ptr(), &girth, circle.ptr()));
   return girth;
 }
-Vector Graph::eccentricity(const VertexSelector &vids,
-                           NeighborMode mode) const {
+Vector Graph::eccentricity(const VertexSelector &vids, Mode mode) const {
   Vector result;
   SafeCall(igraph_eccentricity(ptr(), result.ptr(), vids.vs(),
                                static_cast<igraph_neimode_t>(mode)));
   return result;
 }
-double Graph::eccentricity(int vertex, NeighborMode mode) const {
+double Graph::eccentricity(int vertex, Mode mode) const {
   return eccentricity(VertexSelector::Single(vertex), mode).at(0);
 }
-double Graph::radius(NeighborMode mode) const {
+double Graph::radius(Mode mode) const {
   double radius;
   SafeCall(igraph_radius(ptr(), &radius, static_cast<igraph_neimode_t>(mode)));
   return radius;
@@ -611,33 +616,32 @@ double Graph::radius(NeighborMode mode) const {
 
 /* Neighborhood of a vertex */
 Vector Graph::neighborhood_size(const VertexSelector &vids, int order,
-                                NeighborMode mode) const {
+                                Mode mode) const {
   Vector result;
   SafeCall(igraph_neighborhood_size(ptr(), result.ptr(), vids.vs(), order,
                                     static_cast<igraph_neimode_t>(mode)));
   return result;
 }
-double Graph::neighborhood_size(int vertex, int order,
-                                NeighborMode mode) const {
+double Graph::neighborhood_size(int vertex, int order, Mode mode) const {
   return neighborhood_size(VertexSelector::Single(vertex), order, mode).at(0);
 }
 VectorPtr<VectorView> Graph::neighborhood(const VertexSelector &vids, int order,
-                                          NeighborMode mode) {
+                                          Mode mode) {
   VectorPtr<VectorView> result;
   SafeCall(igraph_neighborhood(ptr(), result.ptr(), vids.vs(), order,
                                static_cast<igraph_neimode_t>(mode)));
   return result;
 }
 VectorPtr<Graph> Graph::neighborhood_graphs(const VertexSelector &vids,
-                                            int order, NeighborMode mode) {
+                                            int order, Mode mode) {
   VectorPtr<Graph> result;
   SafeCall(igraph_neighborhood_graphs(ptr(), result.ptr(), vids.vs(), order,
-                               static_cast<igraph_neimode_t>(mode)));
+                                      static_cast<igraph_neimode_t>(mode)));
   return result;
 }
 
 /* Graph components */
-Vector Graph::subcomponent(int vertex, NeighborMode mode) const {
+Vector Graph::subcomponent(int vertex, Mode mode) const {
   Vector result;
   SafeCall(igraph_subcomponent(ptr(), result.ptr(), static_cast<double>(vertex),
                                static_cast<igraph_neimode_t>(mode)));
@@ -693,7 +697,7 @@ bool Graph::is_graphical_degree_sequence(const Vector &out_degrees,
 }
 
 /* Centrality measures */
-Vector Graph::closeness(const VertexSelector &vids, NeighborMode mode,
+Vector Graph::closeness(const VertexSelector &vids, Mode mode,
                         const VectorView &weights, bool normalized) const {
   Vector result;
   SafeCall(igraph_closeness(
@@ -701,35 +705,36 @@ Vector Graph::closeness(const VertexSelector &vids, NeighborMode mode,
       weights.is_none() ? NULL : weights.ptr(), normalized));
   return result;
 }
-double Graph::closeness(int vertex, NeighborMode mode,
-                        const VectorView &weights, bool normalized) const {
+double Graph::closeness(int vertex, Mode mode, const VectorView &weights,
+                        bool normalized) const {
   return closeness(VertexSelector::Single(vertex), mode, weights, normalized)
       .at(0);
 }
-Vector Graph::betweenness(const VertexSelector &vids, Directedness dir,
+Vector Graph::betweenness(const VertexSelector &vids, bool directed,
                           const VectorView &weights, bool nobigint) const {
   Vector result;
-  SafeCall(igraph_betweenness(ptr(), result.ptr(), vids.vs(), dir,
+  SafeCall(igraph_betweenness(ptr(), result.ptr(), vids.vs(), directed,
                               weights.ptr(), nobigint));
   return result;
 }
-double Graph::betweenness(int vertex, Directedness dir,
-                          const VectorView &weights, bool nobigint) const {
-  return betweenness(VertexSelector::Single(vertex), dir, weights, nobigint)
+double Graph::betweenness(int vertex, bool directed, const VectorView &weights,
+                          bool nobigint) const {
+  return betweenness(VertexSelector::Single(vertex), directed, weights,
+                     nobigint)
       .at(0);
 }
-Vector Graph::edge_betweenness(Directedness dir,
-                               const VectorView &weights) const {
+Vector Graph::edge_betweenness(bool directed, const VectorView &weights) const {
   Vector result;
-  SafeCall(igraph_edge_betweenness(ptr(), result.ptr(), dir, weights.ptr()));
+  SafeCall(
+      igraph_edge_betweenness(ptr(), result.ptr(), directed, weights.ptr()));
   return result;
 }
-PageRank Graph::pagerank(const VertexSelector &vids, Directedness dir,
+PageRank Graph::pagerank(const VertexSelector &vids, bool directed,
                          double damping, const VectorView &weights) const {
   PageRank result;
   SafeCall(igraph_pagerank(ptr(), IGRAPH_PAGERANK_ALGO_PRPACK,
                            result.scores.ptr(), &result.eigenvalue, vids.vs(),
-                           dir, damping, weights.ptr(), NULL));
+                           directed, damping, weights.ptr(), NULL));
   return result;
 }
 Vector Graph::constraint(const VertexSelector &vids,
@@ -741,22 +746,22 @@ Vector Graph::constraint(const VertexSelector &vids,
 double Graph::constraint(int vertex, const VectorView &weights) const {
   return constraint(VertexSelector::Single(vertex), weights).at(0);
 }
-int Graph::maxdegree(const VertexSelector &vids, NeighborMode mode,
-                     Loops loops) const {
+int Graph::maxdegree(const VertexSelector &vids, Mode mode, Loops loops) const {
   int result;
   SafeCall(igraph_maxdegree(ptr(), &result, vids.vs(),
-                            static_cast<igraph_neimode_t>(mode), loops));
+                            static_cast<igraph_neimode_t>(mode),
+                            static_cast<igraph_bool_t>(loops)));
   return result;
 }
-Vector Graph::strength(const VertexSelector &vids, NeighborMode mode,
-                       Loops loops, const VectorView &weights) const {
+Vector Graph::strength(const VertexSelector &vids, Mode mode, Loops loops,
+                       const VectorView &weights) const {
   Vector result;
   SafeCall(igraph_strength(ptr(), result.ptr(), vids.vs(),
-                           static_cast<igraph_neimode_t>(mode), loops,
-                           weights.ptr()));
+                           static_cast<igraph_neimode_t>(mode),
+                           static_cast<igraph_bool_t>(loops), weights.ptr()));
   return result;
 }
-double Graph::strength(int vertex, NeighborMode mode, Loops loops,
+double Graph::strength(int vertex, Mode mode, Loops loops,
                        const VectorView &weights) const {
   return strength(VertexSelector::Single(vertex), mode, loops, weights).at(0);
 }
@@ -772,15 +777,15 @@ Graph &Graph::to_undirected(UndirectedMode mode) {
   return *this;
 }
 
-Graph Graph::ReadEdgelist(FILE *instream, int n, Directedness dir) {
+Graph Graph::ReadEdgelist(FILE *instream, int n, bool directed) {
   igraph_t graph;
-  SafeCall(igraph_read_graph_edgelist(&graph, instream, n, dir));
+  SafeCall(igraph_read_graph_edgelist(&graph, instream, n, directed));
   return Graph(graph);
 }
-Graph Graph::ReadEdgelist(std::string filename, int n, Directedness dir) {
+Graph Graph::ReadEdgelist(std::string filename, int n, bool directed) {
   FILE *fp = fopen(filename.c_str(), "r");
   if (fp == NULL) throw std::runtime_error("File not found");
-  Graph graph = ReadEdgelist(fp, n, dir);
+  Graph graph = ReadEdgelist(fp, n, directed);
   fclose(fp);
   return graph;
 }
