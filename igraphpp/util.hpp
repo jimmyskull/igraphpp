@@ -11,7 +11,8 @@ namespace igraph {
 
 namespace util {
 
-template <typename T, typename = void> struct is_iterator {
+template <typename T, typename = void>
+struct is_iterator {
   static constexpr bool value = false;
 };
 
@@ -24,12 +25,13 @@ struct is_iterator<
 
 constexpr bool all_args() { return true; }
 
-template <typename... Tail> constexpr bool all_args(bool head, Tail... tail) {
+template <typename... Tail>
+constexpr bool all_args(bool head, Tail... tail) {
   return head && all_args(tail...);
 }
 
-} // namespace util
+}  // namespace util
 
-} // namespace igraph
+}  // namespace igraph
 
-#endif // IGRAPHPP_UTIL_HPP_
+#endif  // IGRAPHPP_UTIL_HPP_

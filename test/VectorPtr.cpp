@@ -64,4 +64,3 @@ TEST_CASE("VectorPtr<Matrix>", "[VectorPtr]") {
 
   REQUIRE(mat.at(0, 0) == 1.0);
 }
-

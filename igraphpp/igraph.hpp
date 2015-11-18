@@ -101,7 +101,7 @@ static inline int SetSeed(unsigned long int seed) {
   return SafeCall(ret);
 }
 
-} // namespace igraph
+}  // namespace igraph
 
 #include "./mapper.hpp"
 #include "./vectorptr.hpp"
@@ -113,4 +113,4 @@ static inline int SetSeed(unsigned long int seed) {
 #include "./matrix.hpp"
 #include "./graph.hpp"
 
-#endif // IGRAPHPP_IGRAPH_HPP_
+#endif  // IGRAPHPP_IGRAPH_HPP_

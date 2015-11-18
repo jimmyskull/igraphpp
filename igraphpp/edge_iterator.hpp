@@ -16,7 +16,7 @@ namespace igraph {
 class EdgeSelector;
 
 class EdgeIterator : public std::iterator<std::input_iterator_tag, long int> {
-public:
+ public:
   ~EdgeIterator();
   EdgeIterator(const Graph &graph, const EdgeSelector &es);
   EdgeIterator(const EdgeIterator &vit) = default;
@@ -41,7 +41,7 @@ public:
   igraph_eit_t *ptr() { return &eit_; }
   const igraph_eit_t *ptr() const { return &eit_; }
 
-private:
+ private:
   EdgeIterator(const igraph_eit_t &eit);
 
   igraph_eit_t &eit() { return eit_; }
@@ -49,6 +49,6 @@ private:
   igraph_eit_t eit_;
 };
 
-} // namespace igraph
+}  // namespace igraph
 
-#endif // IGRAPHPP_EDGE_ITERATOR_HPP_
+#endif  // IGRAPHPP_EDGE_ITERATOR_HPP_

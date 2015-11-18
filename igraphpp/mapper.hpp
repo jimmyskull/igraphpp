@@ -3,8 +3,9 @@
 
 namespace igraph {
 
-template <typename T> struct TypeMapper;
+template <typename T>
+struct TypeMapper;
 
-} // namespace igraph
+}  // namespace igraph
 
-#endif // IGRAPHPP_MAPPER_HPP_
+#endif  // IGRAPHPP_MAPPER_HPP_

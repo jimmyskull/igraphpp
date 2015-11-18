@@ -10,7 +10,7 @@
 namespace igraph {
 
 class VertexIterator {
-public:
+ public:
   ~VertexIterator();
 
   VertexIterator(const VertexIterator &vs);
@@ -19,12 +19,12 @@ public:
 
   const igraph_vit_t *ptr() const { return &vit_; }
 
-private:
+ private:
   // VertexIterator(const igraph_vit_t &vs);
 
   igraph_vit_t vit_;
 };
 
-} // namespace igraph
+}  // namespace igraph
 
-#endif // IGRAPHPP_VERTEX_ITERATOR_HPP_
+#endif  // IGRAPHPP_VERTEX_ITERATOR_HPP_

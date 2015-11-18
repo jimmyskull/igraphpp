@@ -64,4 +64,4 @@ EdgeSelector EdgeSelector::Pairs(const Vector &edge_vector, Directedness dir) {
 
 EdgeSelector::EdgeSelector(const igraph_es_t &es) { es_ = es; }
 
-} // namespace igraph
+}  // namespace igraph

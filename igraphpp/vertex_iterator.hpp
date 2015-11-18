@@ -16,7 +16,7 @@ namespace igraph {
 class VertexSelector;
 
 class VertexIterator : public std::iterator<std::input_iterator_tag, long int> {
-public:
+ public:
   ~VertexIterator();
   VertexIterator(const Graph &graph, const VertexSelector &vs);
   VertexIterator(const VertexIterator &vit) = default;
@@ -41,7 +41,7 @@ public:
   igraph_vit_t *ptr() { return &vit_; }
   const igraph_vit_t *ptr() const { return &vit_; }
 
-private:
+ private:
   VertexIterator(const igraph_vit_t &vit);
 
   igraph_vit_t &vit() { return vit_; }
@@ -49,6 +49,6 @@ private:
   igraph_vit_t vit_;
 };
 
-} // namespace igraph
+}  // namespace igraph
 
-#endif // IGRAPHPP_VERTEX_ITERATOR_HPP_
+#endif  // IGRAPHPP_VERTEX_ITERATOR_HPP_

@@ -57,4 +57,4 @@ VertexSelector VertexSelector::Sequence(int from, int to) {
 
 VertexSelector::VertexSelector(const igraph_vs_t &vs) { vs_ = vs; }
 
-} // namespace igraph
+}  // namespace igraph

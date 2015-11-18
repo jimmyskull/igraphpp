@@ -8,7 +8,7 @@
 namespace igraph {
 
 class Exception : public std::exception {
-public:
+ public:
   explicit Exception(int code) : std::exception(), errno_(code){};
 
   virtual ~Exception() throw() {}
@@ -17,16 +17,15 @@ public:
     return igraph_strerror(static_cast<int>(errno_));
   }
 
-private:
+ private:
   int errno_;
 };
 
 static inline int SafeCall(int ret) {
-  if (IGRAPH_UNLIKELY(ret != IGRAPH_SUCCESS))
-    throw Exception(ret);
+  if (IGRAPH_UNLIKELY(ret != IGRAPH_SUCCESS)) throw Exception(ret);
   return ret;
 }
 
-} // namespace igraph
+}  // namespace igraph
 
-#endif // IGRAPHPP_EXCEPTION_HPP_
+#endif  // IGRAPHPP_EXCEPTION_HPP_

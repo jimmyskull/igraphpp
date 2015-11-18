@@ -12,13 +12,14 @@
 
 namespace igraph {
 
-template <typename Type> class VectorPtr {
-private:
+template <typename Type>
+class VectorPtr {
+ private:
   typedef TypeMapper<Type> mapper;
   typedef Type wrapper_t;
   typedef typename mapper::type wrapped_t;
 
-public:
+ public:
   /* Constructors and Destructors */
   ~VectorPtr() { igraph_vector_ptr_destroy(ptr()); }
   VectorPtr(long int size = 0) {
@@ -34,7 +35,7 @@ public:
 
   void clear() noexcept { igraph_vector_ptr_clear(ptr()); }
 
-  void push_back(wrapper_t& element) {
+  void push_back(wrapper_t &element) {
     void *element_pointer = reinterpret_cast<void *>(element.ptr());
     SafeCall(igraph_vector_ptr_push_back(ptr(), element_pointer));
   }
@@ -51,10 +52,10 @@ public:
   igraph_vector_ptr_t *ptr() { return &vector_; }
   const igraph_vector_ptr_t *ptr() const { return &vector_; }
 
-private:
+ private:
   igraph_vector_ptr_t vector_;
 };
 
-} // namespace igraph
+}  // namespace igraph
 
-#endif // IGRAPH_VECTORPTR_HPP_
+#endif  // IGRAPH_VECTORPTR_HPP_
