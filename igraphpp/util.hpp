@@ -5,6 +5,7 @@
 #error "You must include igraph.hpp first"
 #endif
 
+#include <iterator>
 #include <type_traits>
 
 namespace igraph {
