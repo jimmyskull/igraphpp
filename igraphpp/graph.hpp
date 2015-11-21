@@ -86,6 +86,9 @@ class Graph {
   bool is_directed() const noexcept;
   Vector degree(const VertexSelector &vids = VertexSelector::All(),
                 Mode mode = Mode::Out, Loops loops = Loops::None) const;
+  void degree(Vector *degrees,
+              const VertexSelector &vids = VertexSelector::All(),
+              Mode mode = Mode::Out, Loops loops = Loops::None) const;
   double degree(int vertex, Mode mode = Mode::Out,
                 Loops loops = Loops::None) const;
 

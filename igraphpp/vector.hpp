@@ -212,9 +212,11 @@ class Vector : public VectorView {
  protected:
   explicit Vector(const igraph_vector_t &vector);
 
- private:
-  void disown() { VECTOR(*ptr()) = NULL; }
-  bool owner() const { return VECTOR(*ptr()) != NULL; }
+  private:
+  void disown() { owner_ = false; }
+  bool owner() const { return owner_; }
+
+  bool owner_ = true;
 };
 
 template <>

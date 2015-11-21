@@ -136,6 +136,12 @@ Vector Graph::degree(const VertexSelector &vids, Mode mode, Loops loops) const {
                          static_cast<igraph_bool_t>(loops)));
   return degrees;
 }
+void Graph::degree(Vector *degrees, const VertexSelector &vids, Mode mode,
+                   Loops loops) const {
+  SafeCall(igraph_degree(ptr(), degrees->ptr(), vids.vs(),
+                         static_cast<igraph_neimode_t>(mode),
+                         static_cast<igraph_bool_t>(loops)));
+}
 double Graph::degree(int vertex, Mode mode, Loops loops) const {
   return degree(VertexSelector::Single(vertex), mode, loops).at(0);
 }

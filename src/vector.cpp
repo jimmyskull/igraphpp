@@ -144,7 +144,7 @@ long int VectorView::binsearch(double value) const noexcept {
 void VectorView::sort() noexcept { igraph_vector_sort(ptr()); }
 
 Vector::~Vector() {
-  if (VECTOR(*ptr()) != NULL) igraph_vector_destroy(ptr());
+  if (owner()) igraph_vector_destroy(ptr());
 }
 Vector::Vector(long int size) : VectorView() {
   SafeCall(igraph_vector_init(ptr(), size));

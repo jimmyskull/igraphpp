@@ -101,7 +101,12 @@ TEST_CASE("Graph — basic query operations", "[Graph]") {
   VertexSelector sel{{0, 1, 3}};
   CHECK(g.degree(sel) == Vector({2, 4, 1}));
 
+  Vector ext;
+  g.degree(&ext, sel);
+  CHECK(ext == Vector({2, 4, 1}));
+
   CHECK(g.degree(1) == 4);
+  g.degree(&ext, sel);
 }
 
 TEST_CASE("Graph — adding and deleting vertices and edges", "[Graph]") {
