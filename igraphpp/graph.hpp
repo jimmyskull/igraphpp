@@ -10,6 +10,7 @@
 #endif
 
 #include <initializer_list>
+#include <functional>
 #include <string>
 
 #include <igraph/igraph.h>
@@ -443,8 +444,97 @@ class Graph {
   // igraph_contract_vertices
 
   /* Graph visitors */
-  // igraph_bfs
-  // igraph_dfs
+
+  /* Breadth-first search
+   * bfs(0, [](int vid, int pred, int succ, int rank, int dist) -> bool {
+   *   // ...
+   *   // Returns false to continue BFS. Details in doc of igraph_dfshandler_t
+   *   return false;
+   * });
+   * */
+  template <typename Function>
+  void bfs(int root, Function callback, Mode mode = Mode::Out,
+           bool unreachable = true,
+           const VectorView &restricted = VectorView::None()) {
+    SafeCall(igraph_bfs(
+        ptr(), root, NULL, static_cast<igraph_neimode_t>(mode), unreachable,
+        restricted.ptr(), NULL, NULL, NULL, NULL, NULL, NULL,
+        [](const igraph_t *, igraph_integer_t vid, igraph_integer_t pred,
+           igraph_integer_t succ, igraph_integer_t rank, igraph_integer_t dist,
+           void *extra) -> igraph_bool_t {
+          auto cb = *reinterpret_cast<Function *>(extra);
+          return static_cast<igraph_bool_t>(cb(vid, pred, succ, rank, dist));
+        },
+        reinterpret_cast<void *>(&callback)));
+  }
+
+  template <typename Function>
+  void bfs(Vector roots, Function callback, Mode mode = Mode::Out,
+           bool unreachable = true,
+           const VectorView &restricted = VectorView::None()) {
+    SafeCall(igraph_bfs(
+        ptr(), NULL, roots.ptr(), static_cast<igraph_neimode_t>(mode),
+        static_cast<igraph_bool_t>(unreachable), restricted.ptr(), NULL, NULL,
+        NULL, NULL, NULL, NULL,
+        [](const igraph_t *, igraph_integer_t vid, igraph_integer_t pred,
+           igraph_integer_t succ, igraph_integer_t rank, igraph_integer_t dist,
+           void *extra) -> igraph_bool_t {
+          auto cb = *reinterpret_cast<Function *>(extra);
+          return static_cast<igraph_bool_t>(cb(vid, pred, succ, rank, dist));
+        },
+        reinterpret_cast<void *>(&callback)));
+  }
+
+  /* Depth-first search
+   * bfs(0, [](int vid, int dist) -> bool {
+   *   // ...
+   *   // Returns false to continue BFS. Details in doc of igraph_dfshandler_t
+   *   return false;
+   * });
+   * */
+  template <typename Function>
+  void dfs(int root, Function in_callback, Mode mode = Mode::Out,
+           bool unreachable = true, Vector *order = nullptr,
+           Vector *order_out = nullptr, Vector *father = nullptr,
+           Vector *dist = nullptr) {
+    SafeCall(igraph_dfs(
+        ptr(), root, static_cast<igraph_neimode_t>(mode), unreachable,
+        order ? order->ptr() : NULL, order_out ? order_out->ptr() : NULL,
+        father ? father->ptr() : NULL, dist ? dist->ptr() : NULL,
+        [](const igraph_t *, igraph_integer_t vid, igraph_integer_t dist,
+           void *extra) -> igraph_bool_t {
+          auto cb = *reinterpret_cast<Function *>(extra);
+          return static_cast<igraph_bool_t>(cb(vid, dist));
+        },
+        NULL, reinterpret_cast<void *>(&in_callback)));
+  }
+
+  template <typename Function, typename Function2>
+  void dfs(int root, Function in_callback, Function2 out_callback,
+           Mode mode = Mode::Out, bool unreachable = true,
+           Vector *order = nullptr, Vector *order_out = nullptr,
+           Vector *father = nullptr, Vector *dist = nullptr) {
+    struct callbacks {
+      callbacks(Function &icb, Function2 &ocb) : in_cb(icb), out_cb(ocb) {}
+      Function &in_cb;
+      Function2 &out_cb;
+    } cb(in_callback, out_callback);
+    SafeCall(igraph_dfs(
+        ptr(), root, static_cast<igraph_neimode_t>(mode), unreachable,
+        order ? order->ptr() : NULL, order_out ? order_out->ptr() : NULL,
+        father ? father->ptr() : NULL, dist ? dist->ptr() : NULL,
+        [](const igraph_t *, igraph_integer_t vid, igraph_integer_t dist,
+           void *extra) -> igraph_bool_t {
+          auto cb = *reinterpret_cast<callbacks *>(extra);
+          return static_cast<igraph_bool_t>(cb.in_cb(vid, dist));
+        },
+        [](const igraph_t *, igraph_integer_t vid, igraph_integer_t dist,
+           void *extra) -> igraph_bool_t {
+          auto cb = *reinterpret_cast<callbacks *>(extra);
+          return static_cast<igraph_bool_t>(cb.out_cb(vid, dist));
+        },
+        reinterpret_cast<void *>(&cb)));
+  }
 
   /*  Cliques and Independent Vertex Sets */
   // Skipped igraph_cliques

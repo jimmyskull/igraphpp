@@ -462,3 +462,83 @@ TEST_CASE("Graph — Reading and Writing Graphs from and to Files", "[Graph]") {
   CHECK(g3.vcount() == 5);
   CHECK(g3.ecount() == 4);
 }
+
+TEST_CASE("Graph — BFS", "[Graph]") {
+  using igraph::Graph;
+  using igraph::Mode;
+  using igraph::Vector;
+
+  Graph g{{0, 1, 0, 2, 0, 3, 0, 4, 2, 5, 2, 6, 3, 5}};
+  REQUIRE(g.ecount() == 7);
+  REQUIRE(g.vcount() == 7);
+
+  Vector result;
+  g.bfs(0, [&](int vid, int, int, int, int) -> bool {
+    result.push_back(vid);
+    return false;
+  });
+  REQUIRE(result.size() == 7);
+  CHECK(result == Vector({0, 1, 2, 3, 4, 5, 6}));
+
+  result.clear();
+  g.bfs(0, [&](int vid, int, int, int, int) -> bool {
+    result.push_back(vid);
+    return false;
+  }, Mode::All, false, Vector({3, 0, 2}));
+  CHECK(result == Vector({0, 2, 3}));
+
+  result.clear();
+  g.bfs(0, [&](int vid, int, int, int, int) -> bool {
+    result.push_back(vid);
+    return false;
+  }, Mode::All, false, Vector({5, 1, 3, 4, 0, 6}));
+  CHECK(result == Vector({0, 1, 3, 4, 5}));
+
+  Graph g2{{0, 1, 0, 2, 0, 3, 0, 4, 2, 5, 2, 6, 3, 5, 9, 8}};
+  result.clear();
+  g2.bfs(0, [&](int vid, int, int, int, int) -> bool {
+    result.push_back(vid);
+    return false;
+  }, Mode::All, false);
+  CHECK(result.size() == 7);
+  CHECK(result == Vector({0, 1, 2, 3, 4, 5, 6}));
+
+  result.clear();
+  g2.bfs(0, [&](int vid, int, int, int, int) -> bool {
+    result.push_back(vid);
+    return false;
+  }, Mode::All, true);
+  CHECK(result.size() == 10);
+  CHECK(result == Vector({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}));
+}
+
+TEST_CASE("Graph — DFS", "[Graph]") {
+  using igraph::Graph;
+  using igraph::Mode;
+  using igraph::Vector;
+
+  Graph g{{0, 1, 0, 2, 0, 3, 0, 4, 2, 5, 2, 6, 3, 5}};
+  REQUIRE(g.ecount() == 7);
+  REQUIRE(g.vcount() == 7);
+
+  Vector result;
+  g.dfs(0, [&](int vid, int) -> bool {
+    result.push_back(vid);
+    return false;
+  });
+  REQUIRE(result.size() == 7);
+  CHECK(result == Vector({0, 1, 2, 5, 3, 6, 4}));
+
+  result.clear();
+  g.dfs(0, [&](int vid, int) -> bool {
+    result.push_back(vid);
+    return false;
+  },
+  [&](int vid, int) -> bool {
+    result.push_back(vid);
+    return false;
+  });
+  REQUIRE(result.size() == 14);
+  CHECK(result == Vector({0, 1, 1, 2, 5, 3, 3, 5, 6, 6, 2, 4, 4, 0}));
+}
+
