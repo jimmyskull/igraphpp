@@ -510,6 +510,17 @@ TEST_CASE("Graph — BFS", "[Graph]") {
   }, Mode::All, true);
   CHECK(result.size() == 10);
   CHECK(result == Vector({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}));
+
+  Vector order, rank, father, pred, succ, dist;
+  g2.bfs(1, igraph::bfs_default_callback, Mode::All, true,
+         igraph::VectorView::None(), &order, &rank, &father, &pred, &succ,
+         &dist);
+  CHECK(order == Vector({1, 0, 2, 3, 4, 5, 6, 7, 8, 9}));
+  CHECK(rank == Vector({1, 0, 2, 3, 4, 5, 6, 7, 8, 9}));
+  CHECK(father == Vector({1, -1, 0, 0, 0, 2, 2, -1, -1, 8}));
+  CHECK(pred == Vector({1, -1, 0, 2, 3, 4, 5, -1, -1, 8}));
+  CHECK(succ == Vector({2, 0, 3, 4, 5, 6, -1, -1, 9, -1}));
+  CHECK(dist == Vector({1, 0, 2, 2, 2, 3, 3, 0, 0, 1}));
 }
 
 TEST_CASE("Graph — DFS", "[Graph]") {
@@ -530,15 +541,15 @@ TEST_CASE("Graph — DFS", "[Graph]") {
   CHECK(result == Vector({0, 1, 2, 5, 3, 6, 4}));
 
   result.clear();
-  g.dfs(0, [&](int vid, int) -> bool {
-    result.push_back(vid);
-    return false;
-  },
-  [&](int vid, int) -> bool {
-    result.push_back(vid);
-    return false;
-  });
+  g.dfs(0,
+        [&](int vid, int) -> bool {
+          result.push_back(vid);
+          return false;
+        },
+        [&](int vid, int) -> bool {
+          result.push_back(vid);
+          return false;
+        });
   REQUIRE(result.size() == 14);
   CHECK(result == Vector({0, 1, 1, 2, 5, 3, 3, 5, 6, 6, 2, 4, 4, 0}));
 }
-

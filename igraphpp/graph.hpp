@@ -36,6 +36,10 @@ struct PageRank {
   double eigenvalue;
 };
 
+auto bfs_default_callback = [](int /*vid*/, int /*pred*/, int /*succ*/,
+                               int /*rank*/,
+                               int /*dist*/) -> bool { return false; };
+
 class Graph {
   template <typename>
   friend struct TypeMapper;
@@ -453,12 +457,18 @@ class Graph {
    * });
    * */
   template <typename Function>
-  void bfs(int root, Function callback, Mode mode = Mode::Out,
-           bool unreachable = true,
-           const VectorView &restricted = VectorView::None()) {
+  void bfs(int root, Function callback = bfs_default_callback,
+           Mode mode = Mode::Out, bool unreachable = true,
+           const VectorView &restricted = VectorView::None(),
+           Vector *order = nullptr, Vector *rank = nullptr,
+           Vector *father = nullptr, Vector *pred = nullptr,
+           Vector *succ = nullptr, Vector *dist = nullptr) {
     SafeCall(igraph_bfs(
         ptr(), root, NULL, static_cast<igraph_neimode_t>(mode), unreachable,
-        restricted.ptr(), NULL, NULL, NULL, NULL, NULL, NULL,
+        restricted.ptr(), order ? order->ptr() : NULL,
+        rank ? rank->ptr() : NULL, father ? father->ptr() : NULL,
+        pred ? pred->ptr() : NULL, succ ? succ->ptr() : NULL,
+        dist ? dist->ptr() : NULL,
         [](const igraph_t *, igraph_integer_t vid, igraph_integer_t pred,
            igraph_integer_t succ, igraph_integer_t rank, igraph_integer_t dist,
            void *extra) -> igraph_bool_t {
