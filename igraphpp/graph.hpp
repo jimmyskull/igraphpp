@@ -462,7 +462,7 @@ class Graph {
            const VectorView &restricted = VectorView::None(),
            Vector *order = nullptr, Vector *rank = nullptr,
            Vector *father = nullptr, Vector *pred = nullptr,
-           Vector *succ = nullptr, Vector *dist = nullptr) {
+           Vector *succ = nullptr, Vector *dist = nullptr) const {
     SafeCall(igraph_bfs(
         ptr(), root, NULL, static_cast<igraph_neimode_t>(mode), unreachable,
         restricted.ptr(), order ? order->ptr() : NULL,
@@ -481,7 +481,7 @@ class Graph {
   template <typename Function>
   void bfs(Vector roots, Function callback, Mode mode = Mode::Out,
            bool unreachable = true,
-           const VectorView &restricted = VectorView::None()) {
+           const VectorView &restricted = VectorView::None()) const {
     SafeCall(igraph_bfs(
         ptr(), NULL, roots.ptr(), static_cast<igraph_neimode_t>(mode),
         static_cast<igraph_bool_t>(unreachable), restricted.ptr(), NULL, NULL,
@@ -506,7 +506,7 @@ class Graph {
   void dfs(int root, Function in_callback, Mode mode = Mode::Out,
            bool unreachable = true, Vector *order = nullptr,
            Vector *order_out = nullptr, Vector *father = nullptr,
-           Vector *dist = nullptr) {
+           Vector *dist = nullptr) const {
     SafeCall(igraph_dfs(
         ptr(), root, static_cast<igraph_neimode_t>(mode), unreachable,
         order ? order->ptr() : NULL, order_out ? order_out->ptr() : NULL,
@@ -523,7 +523,7 @@ class Graph {
   void dfs(int root, Function in_callback, Function2 out_callback,
            Mode mode = Mode::Out, bool unreachable = true,
            Vector *order = nullptr, Vector *order_out = nullptr,
-           Vector *father = nullptr, Vector *dist = nullptr) {
+           Vector *father = nullptr, Vector *dist = nullptr) const {
     struct callbacks {
       callbacks(Function &icb, Function2 &ocb) : in_cb(icb), out_cb(ocb) {}
       Function &in_cb;
