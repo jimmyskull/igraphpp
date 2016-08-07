@@ -3,25 +3,25 @@ project(IGraphWrapper C CXX)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMakeModules)
 
-if (NOT FOUND_IGRAPH)
+if(NOT FOUND_IGRAPH)
   find_package(IGRAPH REQUIRED)
-endif (NOT FOUND_IGRAPH)
+endif()
 
 include_directories(${IGRAPH_INCLUDES})
 include_directories(${PROJECT_SOURCE_DIR})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra")
 
-Option(BuildExamples "BuildExamples" OFF)
-Option(BuildTest "BuildTest" OFF)
+option(BuildExamples "BuildExamples" OFF)
+option(BuildTest "BuildTest" OFF)
 
 add_subdirectory(src)
 
-if (BuildExamples)
+if(BuildExamples)
   add_subdirectory(examples)
-endif (BuildExamples)
+endif()
 
-if (BuildTest)
+if(BuildTest)
   add_subdirectory(test)
-endif (BuildTest)
+endif()
 

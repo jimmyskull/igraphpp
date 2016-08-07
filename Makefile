@@ -5,7 +5,7 @@ all:
 
 test:
 	mkdir -p build
-	cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && $(MAKE) --no-print-directory
+	cd build && cmake -DCMAKE_BUILD_TYPE=Debug -DBuildTest:Bool=On .. && $(MAKE) --no-print-directory
 	valgrind ./build/test/test_suite -d yes
 
 format:
